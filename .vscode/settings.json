@@ -1,6 +1,0 @@
-{
-    "files.exclude": {
-        ".venv": true,
-        ".vscode": true
-    }
-}
