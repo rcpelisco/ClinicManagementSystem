@@ -3,7 +3,9 @@
 {% block content %}
 <div class="row">
   <div class="col-sm-12">
-    <h1>Index</h1>
+    <h1>Patients <small><a href="{{ url_for('patients.create') }}">
+      <button class="btn btn-primary btn-sm">Add patients</button>
+    </a></small></h1>
   </div>
 </div>
 {% endblock content %}

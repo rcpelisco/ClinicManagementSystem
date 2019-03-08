@@ -15,6 +15,7 @@
     <link href="{{ url_for('static', filename='vendors/simple-line-icons/css/simple-line-icons.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='vendors/pace-progress/css/pace.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendors/dataTables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
   </head>
   <body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
     <header class="app-header navbar">
@@ -72,6 +73,9 @@
     <script src="{{ url_for('static', filename='vendors/@coreui/coreui/dist/js/coreui.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendors/chart.js/dist/Chart.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendors/@coreui/coreui-plugin-chartjs-custom-tooltips/dist/js/custom-tooltips.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendors/dataTables/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block javascript %}
+    {% endblock javascript %}
   </body>
 </html>
