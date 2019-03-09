@@ -9,7 +9,7 @@ users = Blueprint('users', __name__)
 @users.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+        return redirect(url_for('patients.index'))
     form = RegistrationForm()
     print(form.validate_on_submit(), form.name.data, form.username.data, form.position.data, form.password.data, form.confirm_password.data)
     if form.validate_on_submit():
@@ -27,13 +27,13 @@ def register():
 @users.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('patients.index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.password:
             login_user(user)
-            return redirect(url_for('dashboard.index'))
+            return redirect(url_for('patients.index'))
     return render_template('login.html', 
         title='Login', 
         form=form)
