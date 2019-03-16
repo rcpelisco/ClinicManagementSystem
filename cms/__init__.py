@@ -11,10 +11,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/clinic_managemen
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 
-with app.app_context():
-    db.create_all()
-    db.session.commit()
-
 app.jinja_env.filters['datetime'] = format_datetime
 app.jinja_env.filters['date'] = format_date
 app.jinja_env.filters['age'] = format_age
@@ -30,3 +26,8 @@ app.register_blueprint(dashboard, url_prefix='/dashboard')
 app.register_blueprint(patients, url_prefix='/patients')
 app.register_blueprint(medical_records, url_prefix='/medical_records')
 app.register_blueprint(medicine_inventory, url_prefix='/medicine_inventory')
+
+with app.app_context():
+    db.create_all()
+    db.session.commit()
+    
