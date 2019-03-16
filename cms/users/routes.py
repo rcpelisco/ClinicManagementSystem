@@ -13,7 +13,7 @@ def index():
 @users.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+        return redirect(url_for('patients.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed = form.password.data
@@ -36,7 +36,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user.password == form.password.data:
             login_user(user)
-            return redirect(url_for('dashboard.index'))
+            return redirect(url_for('patients.index'))
     return render_template('login.html', 
         title='Login', 
         form=form)
