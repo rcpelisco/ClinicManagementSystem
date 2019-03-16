@@ -6,12 +6,15 @@ from cms.users.forms import RegistrationForm, LoginForm, POSITION_CHOICES
 
 users = Blueprint('users', __name__)
 
+@users.route('/')
+def index():
+    return redirect(url_for('users.login'))
+
 @users.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard.index'))
     form = RegistrationForm()
-    print(form.validate_on_submit(), form.name.data, form.username.data, form.position.data, form.password.data, form.confirm_password.data)
     if form.validate_on_submit():
         hashed = form.password.data
         user = User(name=form.name.data, position=form.position.data,
@@ -27,11 +30,11 @@ def register():
 @users.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('dashboard.index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user and user.password:
+        if user.password == form.password.data:
             login_user(user)
             return redirect(url_for('dashboard.index'))
     return render_template('login.html', 

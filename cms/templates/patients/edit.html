@@ -3,7 +3,7 @@
 {% block content %}
 <div class="row">
   <div class="col-sm-12">
-    <h1>Create Patients</h1>
+    <h1>Edit Patient</h1>
   </div>
 </div>
 <div class="row">
@@ -14,8 +14,9 @@
         <small>Form</small>
       </div>
       <div class="card-body">
-        <form action="{{ url_for('patients.save') }}" method="post">  
+        <form action="{{ url_for('patients.update') }}" method="post">  
           {{ form.hidden_tag() }}
+          {{ form.id() }}
           <div class="row">
             <div class="form-group col-sm-6">
               <label for="first_name">First name</label>
@@ -34,8 +35,7 @@
           </div>
           <div class="form-group">
             <label for="address">Address</label>
-            {{ form.address(class="form-control", 
-              placeholder="Please enter patient's address") }}
+            {{ form.address(class="form-control") }}
           </div>
           {{ form.submit(class="btn btn-primary pull-right") }}
         </div>

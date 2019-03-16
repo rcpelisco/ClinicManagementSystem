@@ -17,15 +17,21 @@ class User(db.Model, UserMixin):
 class Patient(db.Model):
     __tablename__ = 'patients'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
     address = db.Column(db.String(255), nullable=False)
+    medical_records = db.relationship('MedicalRecord', backref='patients',
+        lazy=True)
 
-class Finding(db.Model):
-    __tablename__ = 'findings'
+class MedicalRecord(db.Model):
+    __tablename__ = 'medical_records'
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'), 
         nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    symptom = db.Column(db.String(100), nullable=False)
+    finding = db.Column(db.String(100), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
 class Appointment(db.Model):
@@ -36,9 +42,11 @@ class Appointment(db.Model):
     doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'), 
         nullable=False)
     date = db.Column(db.DateTime, nullable=False)
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
 class Medicine(db.Model):
     __tablename__ = 'medicines'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
+    count = db.Column(db.Integer, nullable=False)
     last_stocked = db.Column(db.DateTime, nullable=False)

@@ -1,0 +1,49 @@
+{% extends "master.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-12">
+    <h1>Medicine Inventory <small><a href="{{ url_for('medicine_inventory.create') }}">
+      <button class="btn btn-primary btn-sm">Add medicine</button>
+    </a></small></h1>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+      <i class="fa fa-align-justify"></i> Medicines List</div>
+      <div class="card-body">
+      <table class="table table-responsive-sm" id="patients-table">
+        <thead>
+          <tr>
+            <th>Last stocked</th>
+            <th>Name</th>
+            <th>Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for medicine in medicines %}
+          <tr>
+            <td>{{ medicine.last_stocked|date }}</td>
+            <td>{{ medicine.name }}</td>
+            <td>{{ medicine.count }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script>
+  $(function() {
+    $('#patients-table').DataTable({
+      paging: false,
+      searching: false
+    })
+  })
+</script>
+{% endblock javascript %}
