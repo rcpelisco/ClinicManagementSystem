@@ -20,12 +20,14 @@ from cms.dashboard.routes import dashboard
 from cms.patients.routes import patients
 from cms.medical_records.routes import medical_records
 from cms.medicine_inventory.routes import medicine_inventory
+from cms.doctors_schedule.routes import doctors_schedule
 
 app.register_blueprint(users, url_prefix='/')
 app.register_blueprint(dashboard, url_prefix='/dashboard')
 app.register_blueprint(patients, url_prefix='/patients')
 app.register_blueprint(medical_records, url_prefix='/medical_records')
 app.register_blueprint(medicine_inventory, url_prefix='/medicine_inventory')
+app.register_blueprint(doctors_schedule, url_prefix='/doctors_schedule')
 
 with app.app_context():
     db.create_all()

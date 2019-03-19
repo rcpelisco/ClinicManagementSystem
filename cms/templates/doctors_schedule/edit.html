@@ -1,0 +1,46 @@
+{% extends "master.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-12">
+    <h1>Edit Patient</h1>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header">
+        <strong>Patients</strong>
+        <small>Form</small>
+      </div>
+      <div class="card-body">
+        <form action="{{ url_for('patients.update') }}" method="post">  
+          {{ form.hidden_tag() }}
+          {{ form.id() }}
+          <div class="row">
+            <div class="form-group col-sm-6">
+              <label for="first_name">First name</label>
+              {{ form.first_name(class="form-control", 
+                placeholder="Please enter patient's first name") }}
+            </div>
+            <div class="form-group col-sm-6">
+              <label for="last_name">Last name</label>
+              {{ form.last_name(class="form-control", 
+                placeholder="Please enter patient's last name") }}
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="date_of_birth">Date of Birth</label>
+            {{ form.date_of_birth(class="form-control") }}
+          </div>
+          <div class="form-group">
+            <label for="address">Address</label>
+            {{ form.address(class="form-control") }}
+          </div>
+          {{ form.submit(class="btn btn-primary pull-right") }}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
