@@ -29,17 +29,20 @@
             <td><a href="{{ url_for('patients.view', patient=patient.id) }}">
               {{ patient.first_name }} {{ patient.last_name }}
             </a></td>
-            <td>{{ patient.date_of_birth }}</td>
+            <td>{{ patient.date_of_birth|date }}</td>
             <td>{{ patient.address }}</td>
             <td>
-              <a href="{{ url_for('patients.view', patient=patient.id)}}">
-                <button class="btn btn-sm btn-primary">View</button>
+              <a href="{{ url_for('patients.view', patient=patient.id)}}" 
+                class="btn btn-sm btn-primary">
+                View
               </a>
-              <a href="{{ url_for('patients.edit', patient=patient.id)}}">
-                <button class="btn btn-sm btn-primary">Edit</button>
+              <a class="btn btn-sm btn-primary" 
+                href="{{ url_for('patients.edit', patient=patient.id)}}">
+                Edit
               </a>
-              <a href="{{ url_for('patients.delete', patient=patient.id)}}">
-                <button class="btn btn-sm btn-danger">Delete</button>
+              <a class="btn btn-sm btn-danger"
+                href="{{ url_for('patients.delete', patient=patient.id)}}">
+                Delete
               </a>
             </td>
           </tr>
@@ -54,10 +57,7 @@
 {% block javascript %}
 <script>
   $(function() {
-    $('#patients-table').DataTable({
-      paging: false,
-      searching: false
-    })
+    $('#patients-table').DataTable()
   })
 </script>
 {% endblock javascript %}

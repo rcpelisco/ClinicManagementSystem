@@ -12,32 +12,51 @@ def view(medical_record):
     return render_template('medical_records/view.html', 
         medical_record=medical_record)
 
-@medical_records.route('/<patient>/create', methods=['GET'])
+@medical_records.route('/<patient>/create', methods=['GET', 'POST'])
 def create(patient):
     form = CreateMedicalRecordForm()
     symptoms = Symptom.query.with_entities(Symptom.symptom).distinct().all()
     form.symptom.choices = [(symptom.symptom, symptom.symptom) for symptom in symptoms]
     patient = Patient.query.get(patient)
     form.patient_id.data = patient.id
-    return render_template('medical_records/create.html', form=form, 
-        patient=patient, symptoms=symptoms)
-
-@medical_records.route('/save', methods=['POST'])
-def save():
-    form = CreateMedicalRecordForm()
     if form.validate_on_submit():
         patient = Patient.query.get(form.patient_id.data)
         medical_record = MedicalRecord(patient_id=patient.id,
             doctor_id=current_user.id,
-            symptom=form.symptom.data, 
             finding=form.finding.data,
             weight=form.weight.data,
             height=form.height.data,
             bp=form.bp.data)
         db.session.add(medical_record)
         db.session.commit()
+        for data in form.symptom.data:
+            symptom = Symptom(medical_record_id=medical_record.id, symptom=data)
+            db.session.add(symptom)
+        db.session.commit()
         return redirect(url_for('patients.view', patient=patient.id))
-    return render_template('medical_records/create.html', form=form)
+    return render_template('medical_records/create.html', form=form, 
+        patient=patient, symptoms=symptoms)
+
+@medical_records.route('/save', methods=['POST'])
+def save():
+    form = CreateMedicalRecordForm()
+    print(form.validate_on_submit())
+    if form.validate_on_submit():
+        patient = Patient.query.get(form.patient_id.data)
+        medical_record = MedicalRecord(patient_id=patient.id,
+            doctor_id=current_user.id,
+            finding=form.finding.data,
+            weight=form.weight.data,
+            height=form.height.data,
+            bp=form.bp.data)
+        db.session.add(medical_record)
+        for data in form.symptom.data:
+            symptom = Symptom(patient_id=patient.id, 
+                medical_record_id=medical_record.id, symptom=data)
+            db.session.add(symptom)
+        db.session.commit()
+        return redirect(url_for('patients.view', patient=patient.id))
+    return redirect(request.referrer)
 
 @medical_records.route('/<medical_record>/edit', methods=['GET'])
 def edit(medical_record):

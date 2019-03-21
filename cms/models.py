@@ -31,13 +31,13 @@ class MedicalRecord(db.Model):
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'), 
         nullable=False)
     doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    symptoms = medical_records = db.relationship('Symptom', 
-        backref='medical_records', lazy=True)
     finding = db.Column(db.String(100), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.now)
     height = db.Column(db.DECIMAL(5, 2), nullable=False)
     weight = db.Column(db.DECIMAL(5, 2), nullable=False)
     bp = db.Column(db.String(20), nullable=False)
+    symptoms = db.relationship('Symptom', 
+        backref='medical_records', lazy=True)
 
 class Symptom(db.Model):
     __tablename__ = 'symptoms'

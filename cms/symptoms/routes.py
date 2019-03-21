@@ -1,29 +1,28 @@
 from flask import Blueprint, render_template, redirect, url_for, request
 from cms import db
 from flask_login import current_user
-from cms.models import Medicine
-from cms.medicine_inventory.forms import CreateMedicineForm, EditMedicineForm
+from cms.models import Symptom
 
-medicine_inventory = Blueprint('medicine_inventory', __name__)
+symptoms = Blueprint('symptoms', __name__)
 
-@medicine_inventory.route('/', methods=['GET'])
+@symptoms.route('/', methods=['GET'])
 def index():
     medicines = Medicine.query.all()
-    return render_template('medicine_inventory/index.html', 
+    return render_template('symptoms/index.html', 
         medicines=medicines)
 
-@medicine_inventory.route('/<medical_record>', methods=['GET'])
+@symptoms.route('/<medical_record>', methods=['GET'])
 def view(medical_record):
     medical_record = MedicalRecord.query.get(medical_record)
-    return render_template('medicine_inventory/view.html', 
+    return render_template('symptoms/view.html', 
         medical_record=medical_record)
 
-@medicine_inventory.route('/create', methods=['GET'])
+@symptoms.route('/create', methods=['GET'])
 def create():
     form = CreateMedicineForm()
-    return render_template('medicine_inventory/create.html', form=form)
+    return render_template('symptoms/create.html', form=form)
 
-@medicine_inventory.route('/save', methods=['POST'])
+@symptoms.route('/save', methods=['POST'])
 def save():
     form = CreateMedicineForm()
     if form.validate_on_submit():
@@ -32,16 +31,16 @@ def save():
             count=form.count.data)
         db.session.add(medicine)
         db.session.commit()
-        return redirect(url_for('medicine_inventory.index'))
-    return render_template('medicine_inventory/create.html', form=form)
+        return redirect(url_for('symptoms.index'))
+    return render_template('symptoms/create.html', form=form)
 
-@medicine_inventory.route('/<medicine>/edit', methods=['GET'])
+@symptoms.route('/<medicine>/edit', methods=['GET'])
 def edit(medical_record):
     patient = Patient.query.get(patient)
     form = EditMedicalRecordForm(obj = patient)
-    return render_template('medicine_inventory/edit.html', patient=patient, form=form)
+    return render_template('symptoms/edit.html', patient=patient, form=form)
     
-@medicine_inventory.route('/update', methods=['POST'])
+@symptoms.route('/update', methods=['POST'])
 def update():
     form = EditMedicalRecordForm()
     if form.validate_on_submit():
@@ -52,12 +51,12 @@ def update():
         patient.address = form.address.data
         
         db.session.commit()
-        return redirect(url_for('medicine_inventory.view', patient=patient.id))
+        return redirect(url_for('symptoms.view', patient=patient.id))
     return redirect(request.referrer)
 
-@medicine_inventory.route('<patient>/delete/', methods=['GET'])
+@symptoms.route('<patient>/delete/', methods=['GET'])
 def delete(patient):
     patient = Patient.query.get(int(patient))
     db.session.delete(patient)
     db.session.commit()
-    return redirect(url_for('medicine_inventory.index'))
+    return redirect(url_for('symptoms.index'))

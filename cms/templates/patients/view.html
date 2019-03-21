@@ -56,7 +56,11 @@
                     {% for medical_record in patient.medical_records %}
                     <tr>
                       <td>{{ medical_record.date|datetime }}</td>
-                      <td>{{ medical_record.symptom }}</td>
+                      <td>
+                      {% for symptom in medical_record.symptoms %}
+                        {{ symptom.symptom }}{{ ", " if not loop.last }}
+                      {% endfor %}
+                        </td>
                       <td>{{ medical_record.finding }}</td>
                       <td>
                         <a href="{{ url_for('medical_records.edit', 
