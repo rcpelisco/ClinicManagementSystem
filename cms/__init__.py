@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 from cms.filters import format_date, format_datetime, format_age
 
 app = Flask(__name__)
@@ -10,6 +11,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/clinic_managemen
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
+ma = Marshmallow(app)
 
 app.jinja_env.filters['datetime'] = format_datetime
 app.jinja_env.filters['date'] = format_date

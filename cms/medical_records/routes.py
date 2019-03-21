@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request
 from cms import db
 from flask_login import current_user
-from cms.models import MedicalRecord, Patient
+from cms.models import MedicalRecord, Patient, Symptom
 from cms.medical_records.forms import CreateMedicalRecordForm, EditMedicalRecordForm
 
 medical_records = Blueprint('medical_records', __name__)
@@ -15,10 +15,12 @@ def view(medical_record):
 @medical_records.route('/<patient>/create', methods=['GET'])
 def create(patient):
     form = CreateMedicalRecordForm()
+    symptoms = Symptom.query.with_entities(Symptom.symptom).distinct().all()
+    form.symptom.choices = [(symptom.symptom, symptom.symptom) for symptom in symptoms]
     patient = Patient.query.get(patient)
     form.patient_id.data = patient.id
     return render_template('medical_records/create.html', form=form, 
-        patient=patient)
+        patient=patient, symptoms=symptoms)
 
 @medical_records.route('/save', methods=['POST'])
 def save():
@@ -28,7 +30,10 @@ def save():
         medical_record = MedicalRecord(patient_id=patient.id,
             doctor_id=current_user.id,
             symptom=form.symptom.data, 
-            finding=form.finding.data)
+            finding=form.finding.data,
+            weight=form.weight.data,
+            height=form.height.data,
+            bp=form.bp.data)
         db.session.add(medical_record)
         db.session.commit()
         return redirect(url_for('patients.view', patient=patient.id))

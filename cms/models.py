@@ -1,4 +1,5 @@
-from cms import db, login_manager
+from cms import db, login_manager, ma
+from marshmallow import fields
 from flask_login import UserMixin
 from datetime import datetime
 
@@ -30,9 +31,20 @@ class MedicalRecord(db.Model):
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'), 
         nullable=False)
     doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    symptom = db.Column(db.String(100), nullable=False)
+    symptoms = medical_records = db.relationship('Symptom', 
+        backref='medical_records', lazy=True)
     finding = db.Column(db.String(100), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    height = db.Column(db.DECIMAL(5, 2), nullable=False)
+    weight = db.Column(db.DECIMAL(5, 2), nullable=False)
+    bp = db.Column(db.String(20), nullable=False)
+
+class Symptom(db.Model):
+    __tablename__ = 'symptoms'
+    id = db.Column(db.Integer, primary_key=True)
+    medical_record_id = db.Column(db.Integer, 
+        db.ForeignKey('medical_records.id'), nullable=False)
+    symptom = db.Column(db.String(100), nullable=False)
 
 class Appointment(db.Model):
     __tablename__ = 'appointents'
@@ -43,6 +55,8 @@ class Appointment(db.Model):
         nullable=False)
     date = db.Column(db.DateTime, nullable=False)
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    doctor = db.relationship('User', backref='appointments', lazy=True)
+    patient = db.relationship('Patient', backref='appointments', lazy=True)
 
 class Medicine(db.Model):
     __tablename__ = 'medicines'
@@ -50,3 +64,20 @@ class Medicine(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False)
     count = db.Column(db.Integer, nullable=False)
     last_stocked = db.Column(db.DateTime, nullable=False)
+
+class PatientSchema(ma.ModelSchema):
+    # first_name = fields.String()
+    # last_name = fields.String()
+    class Meta: 
+        model = Patient
+
+class UserSchema(ma.ModelSchema):
+    # name = fields.String()
+    class Meta: 
+        model = User
+
+class AppointmentSchema(ma.ModelSchema):
+    doctor = fields.Nested('UserSchema')
+    patient = fields.Nested('PatientSchema')
+    class Meta: 
+        model = Appointment

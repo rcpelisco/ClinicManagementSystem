@@ -1,16 +1,16 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField
-from wtforms.fields.html5 import DateField
+from wtforms import StringField, SubmitField, IntegerField, SelectField
+from wtforms.fields.html5 import DateTimeField
 from wtforms.validators import DataRequired, Length
 from wtforms.widgets import HiddenInput
 from cms.models import Medicine
 
-class CreateMedicineForm(FlaskForm):
-    last_stocked = DateField('Last stocked', validators=[DataRequired()])
-    name = StringField('Name', validators=[DataRequired(), Length(min=2)])
-    count = IntegerField('Count', validators=[DataRequired()])
-    submit = SubmitField('Add Medicine')
+class CreateDoctorScheduleForm(FlaskForm):
+    date = StringField('Date', validators=[DataRequired()])
+    patient_id = SelectField('Patient', coerce=int)
+    doctor_id = SelectField('Doctor', coerce=int)
+    submit = SubmitField('Save Schedule')
  
-class EditMedicineForm(CreateMedicineForm):
+class EditDoctorScheduleForm(CreateDoctorScheduleForm):
     id = IntegerField(widget=HiddenInput())
     
