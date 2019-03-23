@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, request
+from flask import Blueprint, render_template, redirect, url_for, request, jsonify
 from cms import db
-from cms.models import Patient
+from cms.models import Patient, PatientSchema
 from cms.patients.forms import CreatePatientForm, EditPatientForm
 
 patients = Blueprint('patients', __name__)
@@ -8,12 +8,15 @@ patients = Blueprint('patients', __name__)
 @patients.route('/', methods=['GET'])
 def index():
     patients = Patient.query.all()
+    patients_schema = PatientSchema(many=True)
+    output = patients_schema.dump(patients).data
     return render_template('patients/index.html', patients=patients)
 
 @patients.route('/<patient>', methods=['GET'])
 def view(patient):
     patient = Patient.query.get(patient)
-    print(patient.medical_records)
+    patient_schema = PatientSchema()
+    output = patient_schema.dump(patient).data
     return render_template('patients/view.html', patient=patient)
 
 @patients.route('/create', methods=['GET'])

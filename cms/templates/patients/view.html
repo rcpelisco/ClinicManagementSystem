@@ -61,7 +61,7 @@
                         {{ symptom.symptom }}{{ ", " if not loop.last }}
                       {% endfor %}
                         </td>
-                      <td>{{ medical_record.finding }}</td>
+                      <td>{{ medical_record.findings.findings }}</td>
                       <td>
                         <a href="{{ url_for('medical_records.edit', 
                           medical_record=medical_record.id) }}">

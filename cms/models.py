@@ -20,10 +20,10 @@ class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
+    gender = db.Column(db.String(50), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
     address = db.Column(db.String(255), nullable=False)
-    medical_records = db.relationship('MedicalRecord', backref='patients',
-        lazy=True)
+    medical_records = db.relationship('MedicalRecord', backref='patients')
 
 class MedicalRecord(db.Model):
     __tablename__ = 'medical_records'
@@ -31,13 +31,18 @@ class MedicalRecord(db.Model):
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'), 
         nullable=False)
     doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    finding = db.Column(db.String(100), nullable=False)
+    findings_id = db.Column(db.Integer, db.ForeignKey('findings.id'), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    height = db.Column(db.DECIMAL(5, 2), nullable=False)
-    weight = db.Column(db.DECIMAL(5, 2), nullable=False)
+    height = db.Column(db.String(7), nullable=False)
+    weight = db.Column(db.String(7), nullable=False)
     bp = db.Column(db.String(20), nullable=False)
-    symptoms = db.relationship('Symptom', 
-        backref='medical_records', lazy=True)
+    findings = db.relationship('Findings', backref='medical_records')
+    symptoms = db.relationship('Symptom',  backref='medical_records', lazy=True)
+
+class Findings(db.Model):
+    __tablename__ = 'findings'
+    id = db.Column(db.Integer, primary_key=True)
+    findings = db.Column(db.String(50), nullable=False)
 
 class Symptom(db.Model):
     __tablename__ = 'symptoms'
@@ -66,13 +71,12 @@ class Medicine(db.Model):
     last_stocked = db.Column(db.DateTime, nullable=False)
 
 class PatientSchema(ma.ModelSchema):
-    # first_name = fields.String()
-    # last_name = fields.String()
+    medical_records = fields.Nested('MedicalRecordSchema', many=True,
+        exclude=('patients',))
     class Meta: 
         model = Patient
 
 class UserSchema(ma.ModelSchema):
-    # name = fields.String()
     class Meta: 
         model = User
 
@@ -81,3 +85,20 @@ class AppointmentSchema(ma.ModelSchema):
     patient = fields.Nested('PatientSchema')
     class Meta: 
         model = Appointment
+
+class MedicalRecordSchema(ma.ModelSchema):
+    doctor = fields.Nested('UserSchema')
+    symptoms = fields.Nested('SymptomSchema', many=True, 
+        exclude=('medical_records',))
+    findings = fields.Nested('FindingsSchema',
+        exclude=('medical_records',))
+    class Meta:
+        model = MedicalRecord
+
+class SymptomSchema(ma.ModelSchema):
+    class Meta:
+        model = Symptom
+
+class FindingsSchema(ma.ModelSchema):
+    class Meta:
+        model = Findings

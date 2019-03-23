@@ -1,9 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField, DecimalField, SelectMultipleField 
+from cms.models import MedicalRecord
+from wtforms import SelectMultipleField 
+from wtforms import StringField, SubmitField, IntegerField, DecimalField
+from wtforms.widgets import HiddenInput
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length
-from wtforms.widgets import HiddenInput
-from cms.models import MedicalRecord
 
 class NoValidationSelectMultipleField(SelectMultipleField):
     def pre_validate(self, form):
