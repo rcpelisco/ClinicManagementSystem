@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -12,6 +13,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/clinic_managemen
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 ma = Marshmallow(app)
+bcrypt = Bcrypt(app)
 
 app.jinja_env.filters['datetime'] = format_datetime
 app.jinja_env.filters['date'] = format_date

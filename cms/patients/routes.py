@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify
+from datetime import datetime
 from cms import db
 from cms.models import Patient, PatientSchema
 from cms.patients.forms import CreatePatientForm, EditPatientForm
@@ -30,6 +31,7 @@ def save():
     if form.validate_on_submit():
         patient = Patient(first_name=form.first_name.data, 
             last_name=form.last_name.data,
+            gender=form.gender.data,
             date_of_birth=form.date_of_birth.data,
             address=form.address.data)
         db.session.add(patient)
@@ -41,6 +43,7 @@ def save():
 def edit(patient):
     patient = Patient.query.get(patient)
     form = EditPatientForm(obj = patient)
+    print(form.date_of_birth.data)
     return render_template('patients/edit.html', patient=patient, form=form)
     
 @patients.route('/update', methods=['POST'])
@@ -49,6 +52,7 @@ def update():
     if form.validate_on_submit():
         patient = Patient.query.get(form.id.data)
         patient.first_name = form.first_name.data
+        patient.gender = form.gender.data
         patient.last_name = form.last_name.data
         patient.date_of_birth = form.date_of_birth.data
         patient.address = form.address.data

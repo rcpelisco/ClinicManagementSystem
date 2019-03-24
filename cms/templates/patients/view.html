@@ -54,22 +54,38 @@
                   </thead>
                   <tbody>
                     {% for medical_record in patient.medical_records %}
-                    <tr>
+                    <tr class="{{ '' if medical_record.paid else 'text-danger' }}">
                       <td>{{ medical_record.date|datetime }}</td>
                       <td>
-                      {% for symptom in medical_record.symptoms %}
+                        {% for symptom in medical_record.symptoms %}
                         {{ symptom.symptom }}{{ ", " if not loop.last }}
-                      {% endfor %}
+                        {% if loop.index % 2 == 0 %}
+                          <br>
+                        {% endif %}
+                        {% endfor %}
                         </td>
                       <td>{{ medical_record.findings.findings }}</td>
                       <td>
                         <a href="{{ url_for('medical_records.edit', 
-                          medical_record=medical_record.id) }}">
-                          <button class="btn btn-sm btn-primary">Edit</button>
+                          medical_record=medical_record.id) }}" 
+                          class="btn btn-sm btn-primary">
+                          Edit
                         </a>
+                        {% if medical_record.paid %}
+                        <button class="btn btn-sm btn-primary" disabled>
+                          Paid
+                        </button>
+                        {% else %}
+                        <a href="{{ url_for('medical_records.pay', 
+                          medical_record=medical_record.id) }}" 
+                          class="btn btn-sm btn-primary">
+                          Pay
+                        </a>
+                        {% endif %}
                         <a href="{{ url_for('medical_records.delete', 
-                          medical_record=medical_record.id) }}">
-                          <button class="btn btn-sm btn-danger">Delete</button>
+                          medical_record=medical_record.id) }}" 
+                          class="btn btn-sm btn-danger">
+                          Delete
                         </a>
                       </td>
                     </tr>

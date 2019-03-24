@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify
 from cms import db
+from datetime import datetime
 from flask_login import current_user
 from cms.models import MedicalRecordSchema
 from cms.models import MedicalRecord, Patient, Symptom, Findings
@@ -19,7 +20,10 @@ def index():
 
 @medical_records.route('/<medical_record>', methods=['GET'])
 def view(medical_record):
-    medical_record = MedicalRecord.query.get(medical_record)    
+    medical_record = MedicalRecord.query.get(medical_record)  
+    medical_record_schema = MedicalRecordSchema()
+    output = medical_record_schema.dump(medical_record).data
+    return jsonify(output)
     return render_template('medical_records/view.html', 
         medical_record=medical_record)
 
@@ -41,11 +45,12 @@ def create(patient):
             db.session.commit()
         patient = Patient.query.get(form.patient_id.data)
         medical_record = MedicalRecord(patient_id=patient.id, 
+            date=form.date.data,
             findings_id=findings.id,
             doctor_id=current_user.id,
             weight=form.weight.data,
             height=form.height.data,
-            bp=form.bp.data)
+            temperature=form.temperature.data)
         db.session.add(medical_record)
         db.session.commit()
         for data in form.symptom.data:
@@ -74,7 +79,8 @@ def edit(medical_record):
         medical_record.findings_id = findings.id
         medical_record.weight=form.weight.data
         medical_record.height=form.height.data
-        medical_record.bp=form.bp.data
+        medical_record.date=form.date.data
+        medical_record.temperature=form.temperature.data
         symptoms = Symptom.query\
             .filter(Symptom.medical_record_id == medical_record.id).delete()
         db.session.commit()
@@ -84,14 +90,25 @@ def edit(medical_record):
             db.session.add(symptom)
         db.session.commit()
         return redirect(url_for('patients.view', patient=patient.id))
+    form.date.data = datetime.strftime(medical_record.date, '%Y-%m-%d %H:%M %p')
     form.weight.data = float(medical_record.weight)
     form.height.data = float(medical_record.height)
+    form.temperature.data = float(medical_record.temperature)
     form.symptom.choices = [(symptom.symptom, symptom.symptom) 
         for symptom in symptoms]
     form.symptom.data = [symptom.symptom for symptom in medical_record.symptoms]
     form.finding.data = medical_record.findings.findings
     return render_template('medical_records/edit.html', 
         medical_record=medical_record, form=form)
+
+@medical_records.route('/<medical_record>/pay', methods=['GET'])
+def pay(medical_record):
+    medical_record = MedicalRecord.query.get(medical_record)
+    medical_record_schema = MedicalRecordSchema()
+    output = medical_record_schema.dump(medical_record).data
+    medical_record.paid = 1    
+    db.session.commit()
+    return redirect(url_for('patients.view', patient=medical_record.patient.id))
     
 @medical_records.route('/update', methods=['POST'])
 def update():

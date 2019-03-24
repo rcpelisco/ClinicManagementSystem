@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 
 def format_datetime(value):
     datetime_object = value
-    return datetime_object.strftime('%B %d, %Y - %I:%M:%S %p')
+    return datetime_object.strftime('%B %d, %Y - %I:%M %p')
 
 def format_date(value):
     date_object = value

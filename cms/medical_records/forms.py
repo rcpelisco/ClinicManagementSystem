@@ -13,12 +13,12 @@ class NoValidationSelectMultipleField(SelectMultipleField):
 class CreateMedicalRecordForm(FlaskForm):
     patient_id = IntegerField(widget=HiddenInput())
     symptom = NoValidationSelectMultipleField('Symptom', coerce=str)
-    weight = DecimalField('Weight', validators=[DataRequired()])
-    height = DecimalField('Height', validators=[DataRequired()])
-    bp = StringField('Blood Pressure', validators=[DataRequired(), 
-        Length(min=2)])
+    weight = DecimalField('Weight (kg)', validators=[DataRequired()])
+    height = DecimalField('Height (cm)', validators=[DataRequired()])
+    temperature = DecimalField('Temperature (&#176;C)', 
+        validators=[DataRequired()])
     finding = StringField('Finding', validators=[DataRequired(), Length(min=2)])
-    date = DateField('Date', validators=[DataRequired()])
+    date = StringField('Date', validators=[DataRequired()])
     submit = SubmitField('Save Medical Record')
  
 class EditMedicalRecordForm(CreateMedicalRecordForm):

@@ -1,7 +1,7 @@
 from cms import db, login_manager, ma
 from marshmallow import fields
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, date
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -23,7 +23,7 @@ class Patient(db.Model):
     gender = db.Column(db.String(50), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
     address = db.Column(db.String(255), nullable=False)
-    medical_records = db.relationship('MedicalRecord', backref='patients')
+    # medical_records = db.relationship('MedicalRecord', backref='patients')
 
 class MedicalRecord(db.Model):
     __tablename__ = 'medical_records'
@@ -35,9 +35,18 @@ class MedicalRecord(db.Model):
     date = db.Column(db.DateTime, nullable=False, default=datetime.now)
     height = db.Column(db.String(7), nullable=False)
     weight = db.Column(db.String(7), nullable=False)
-    bp = db.Column(db.String(20), nullable=False)
+    temperature = db.Column(db.String(7), nullable=False)
+    paid = db.Column(db.Boolean, nullable=False, default=False)
     findings = db.relationship('Findings', backref='medical_records')
     symptoms = db.relationship('Symptom',  backref='medical_records', lazy=True)
+    patient = db.relationship('Patient', backref='medical_records')
+
+class LabExam(db.Model):
+    __tablename__ = 'lab_exams'
+    id = db.Column(db.Integer, primary_key=True)
+    medical_record_id = db.Column(db.Integer, 
+        db.ForeignKey('medical_records.id'), nullable=False)
+    stool_exam = db.Column(db.String(10))
 
 class Findings(db.Model):
     __tablename__ = 'findings'
@@ -90,8 +99,8 @@ class MedicalRecordSchema(ma.ModelSchema):
     doctor = fields.Nested('UserSchema')
     symptoms = fields.Nested('SymptomSchema', many=True, 
         exclude=('medical_records',))
-    findings = fields.Nested('FindingsSchema',
-        exclude=('medical_records',))
+    findings = fields.Nested('FindingsSchema', exclude=('medical_records',))
+    patient = fields.Nested('PatientSchema', exclude=('medical_records',))
     class Meta:
         model = MedicalRecord
 
@@ -102,3 +111,9 @@ class SymptomSchema(ma.ModelSchema):
 class FindingsSchema(ma.ModelSchema):
     class Meta:
         model = Findings
+
+class RecordSchema(ma.ModelSchema):
+    class Meta:
+        model = MedicalRecord
+    findings = fields.Nested('FindingsSchema', exclude=('medical_records',))
+    patient = fields.Nested('PatientSchema', only=['gender', 'date_of_birth'])
