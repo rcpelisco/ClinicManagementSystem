@@ -2,10 +2,13 @@ from flask import Blueprint, render_template, redirect, url_for, request, jsonif
 from cms import db
 from datetime import datetime
 from flask_login import current_user
+from cms.models import CBCExam, LabExam
 from cms.models import MedicalRecordSchema
 from cms.models import MedicalRecord, Patient, Symptom, Findings
 from cms.medical_records.forms import EditMedicalRecordForm
 from cms.medical_records.forms import CreateMedicalRecordForm
+from cms.lab_exams.forms import CreateCBCExamForm, EditCBCExamForm
+from cms.lab_exams.forms import CreateLabExamForm, CreateLabExamForm
 
 medical_records = Blueprint('medical_records', __name__)
 
@@ -30,6 +33,8 @@ def view(medical_record):
 @medical_records.route('/<patient>/create', methods=['GET', 'POST'])
 def create(patient):
     form = CreateMedicalRecordForm()
+    lab_exam_form = CreateLabExamForm()
+    cbc_exam_form = CreateCBCExamForm()
     symptoms = Symptom.query.with_entities(Symptom.symptom).distinct().all()
     form.symptom.choices = [(symptom.symptom, symptom.symptom) 
         for symptom in symptoms]
@@ -57,8 +62,24 @@ def create(patient):
             symptom = Symptom(medical_record_id=medical_record.id, symptom=data)
             db.session.add(symptom)
         db.session.commit()
+        if lab_exam_form.validate_on_submit() and\
+            cbc_exam_form.validate_on_submit():
+            cbc_exam = CBCExam(
+                red_blood_cell_count=cbc_exam_form.red_blood_cell_count.data,
+                white_blood_cell_count=cbc_exam_form.white_blood_cell_count.data,
+                platelet_count=cbc_exam_form.platelet_count.data,
+                hemoglobin=cbc_exam_form.hemoglobin.data,
+                hematocrit=cbc_exam_form.hematocrit.data)
+            db.session.add(cbc_exam)
+            db.session.commit()
+            lab_exam = LabExam(cbc_exam_id=cbc_exam.id, 
+                medical_record_id=medical_record.id,
+                stool_exam=lab_exam_form.stool_analysis.data)
+            db.session.add(lab_exam)
+            db.session.commit()
         return redirect(url_for('patients.view', patient=patient.id))
     return render_template('medical_records/create.html', form=form, 
+        lab_exam_form=lab_exam_form, cbc_exam_form=cbc_exam_form,
         patient=patient, symptoms=symptoms)
 
 @medical_records.route('/<medical_record>/edit', methods=['GET', 'POST'])
@@ -68,6 +89,12 @@ def edit(medical_record):
     medical_record_schema = MedicalRecordSchema()
     output = medical_record_schema.dump(medical_record).data
     form = EditMedicalRecordForm(obj = medical_record)
+    lab_exam = LabExam.query\
+        .filter(LabExam.medical_record_id==medical_record.id).first()
+    print(lab_exam.id)
+    lab_exam_form = CreateLabExamForm(obj = lab_exam)
+    cbc_exam = CBCExam.query.get(lab_exam.cbc_exam_id)
+    cbc_exam_form = CreateCBCExamForm(obj = cbc_exam)
     if form.validate_on_submit():
         findings = (Findings.query
             .filter(Findings.findings == form.finding.data).first())
@@ -89,6 +116,18 @@ def edit(medical_record):
             symptom = Symptom(medical_record_id=medical_record.id, symptom=data)
             db.session.add(symptom)
         db.session.commit()
+        if lab_exam_form.validate_on_submit() and\
+            cbc_exam_form.validate_on_submit():
+            cbc_exam.red_blood_cell_count=cbc_exam_form.red_blood_cell_count.data
+            cbc_exam.white_blood_cell_count=cbc_exam_form.white_blood_cell_count.data
+            cbc_exam.platelet_count=cbc_exam_form.platelet_count.data
+            cbc_exam.hemoglobin=cbc_exam_form.hemoglobin.data
+            cbc_exam.hematocrit=cbc_exam_form.hematocrit.data
+            db.session.commit()
+            lab_exam.cbc_exam_id=cbc_exam.id 
+            lab_exam.medical_record_id=medical_record.id
+            lab_exam.stool_exam=lab_exam_form.stool_analysis.data
+            db.session.commit()
         return redirect(url_for('patients.view', patient=patient.id))
     form.date.data = datetime.strftime(medical_record.date, '%Y-%m-%d %H:%M %p')
     form.weight.data = float(medical_record.weight)
@@ -99,6 +138,7 @@ def edit(medical_record):
     form.symptom.data = [symptom.symptom for symptom in medical_record.symptoms]
     form.finding.data = medical_record.findings.findings
     return render_template('medical_records/edit.html', 
+        lab_exam_form=lab_exam_form, cbc_exam_form=cbc_exam_form,
         medical_record=medical_record, form=form)
 
 @medical_records.route('/<medical_record>/pay', methods=['GET'])

@@ -20,18 +20,20 @@ app.jinja_env.filters['date'] = format_date
 app.jinja_env.filters['age'] = format_age
 
 from cms.users.routes import users
-from cms.dashboard.routes import dashboard
 from cms.patients.routes import patients
+from cms.lab_exams.routes import lab_exams
+from cms.dashboard.routes import dashboard
 from cms.medical_records.routes import medical_records
-from cms.medicine_inventory.routes import medicine_inventory
 from cms.doctors_schedule.routes import doctors_schedule
+from cms.medicine_inventory.routes import medicine_inventory
 
 app.register_blueprint(users, url_prefix='/')
-app.register_blueprint(dashboard, url_prefix='/dashboard')
 app.register_blueprint(patients, url_prefix='/patients')
+app.register_blueprint(lab_exams, url_prefix='/lab_exams')
+app.register_blueprint(dashboard, url_prefix='/dashboard')
 app.register_blueprint(medical_records, url_prefix='/medical_records')
-app.register_blueprint(medicine_inventory, url_prefix='/medicine_inventory')
 app.register_blueprint(doctors_schedule, url_prefix='/doctors_schedule')
+app.register_blueprint(medicine_inventory, url_prefix='/medicine_inventory')
 
 with app.app_context():
     db.create_all()

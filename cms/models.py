@@ -37,16 +37,32 @@ class MedicalRecord(db.Model):
     weight = db.Column(db.String(7), nullable=False)
     temperature = db.Column(db.String(7), nullable=False)
     paid = db.Column(db.Boolean, nullable=False, default=False)
-    findings = db.relationship('Findings', backref='medical_records')
-    symptoms = db.relationship('Symptom',  backref='medical_records', lazy=True)
+    findings = db.relationship('Findings', backref='medical_records',
+        cascade='delete')
+    symptoms = db.relationship('Symptom',  backref='medical_records', 
+        cascade='delete')
     patient = db.relationship('Patient', backref='medical_records')
+    lab_exam = db.relationship('LabExam', backref='medical_records', 
+        cascade='delete')
 
 class LabExam(db.Model):
     __tablename__ = 'lab_exams'
     id = db.Column(db.Integer, primary_key=True)
     medical_record_id = db.Column(db.Integer, 
         db.ForeignKey('medical_records.id'), nullable=False)
+    cbc_exam_id = db.Column(db.Integer, db.ForeignKey('cbc_exams.id'), 
+        nullable=False)
     stool_exam = db.Column(db.String(10))
+    cbc_exam = db.relationship('CBCExam', backref='lab_exams')
+
+class CBCExam(db.Model):
+    __tablename__ = 'cbc_exams'
+    id = db.Column(db.Integer, primary_key=True)
+    red_blood_cell_count = db.Column(db.String(10))
+    white_blood_cell_count = db.Column(db.String(10))
+    platelet_count = db.Column(db.String(10))
+    hemoglobin = db.Column(db.String(10))
+    hematocrit = db.Column(db.String(10))
 
 class Findings(db.Model):
     __tablename__ = 'findings'
@@ -113,7 +129,7 @@ class FindingsSchema(ma.ModelSchema):
         model = Findings
 
 class RecordSchema(ma.ModelSchema):
-    class Meta:
-        model = MedicalRecord
     findings = fields.Nested('FindingsSchema', exclude=('medical_records',))
     patient = fields.Nested('PatientSchema', only=['gender', 'date_of_birth'])
+    class Meta:
+        model = MedicalRecord

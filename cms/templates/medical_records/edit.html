@@ -7,62 +7,107 @@
 {% block content %}
 <div class="row">
   <div class="col-sm-12">
-    <h1>Edit Patient</h1>
+    <h1>Edit Medical Record</h1>
   </div>
 </div>
-<div class="row">
-  <div class="col-sm-6">
-    <div class="card">
-      <div class="card-header">
-        <strong>Patients</strong>
-        <small>Form</small>
+{% if form.errors %}
+  {{ form.errors }}
+{% endif %}
+<form action="{{ url_for('medical_records.edit', 
+  medical_record=medical_record.id) }}" method="post">  
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-header">
+          <strong>Medical Record</strong>
+          <small>Form</small>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12">
+              {{ form.hidden_tag() }}
+              <div class="form-group">
+                {{ form.date.label }}
+                {{ form.date(class="form-control datetimepicker-input", 
+                  data_toggle="datetimepicker", data_target="#date") }}
+              </div>
+              <div class="row">
+                <div class="form-group col-sm-6">
+                  {{ form.weight.label }}
+                  {{ form.weight(class="form-control", 
+                    placeholder="Please enter patient's weight") }}
+                </div>
+                <div class="form-group col-sm-6">
+                  {{ form.height.label }}
+                  {{ form.height(class="form-control", 
+                    placeholder="Please enter patient's height") }}
+                </div>
+              </div>
+              <div class="form-group">
+                {{ form.symptom.label }}
+                {{ form.symptom(class="form-control selectized", 
+                  multiple="multiple", placeholder="Enter symptoms") }}
+              </div>
+              <div class="row">
+                <div class="form-group col-sm-6">
+                  {{ form.temperature.label }}
+                  {{ form.temperature(class="form-control", 
+                  placeholder="Enter patient's temperature") }}
+                </div>
+                <div class="form-group col-sm-6">
+                  {{ form.finding.label }}
+                  {{ form.finding(class="form-control", 
+                    placeholder="Please enter finding") }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="card-body">
-        {% if form.errors %}
-          {{ form.errors }}
-        {% endif %}
-        <form action="{{ url_for('medical_records.edit', medical_record=medical_record.id) }}" method="post">  
-          {{ form.hidden_tag() }}
-          <div class="form-group">
-            {{ form.date.label }}
-            {{ form.date(class="form-control datetimepicker-input", 
-            data_toggle="datetimepicker", data_target="#date") }}
-          </div>
-          <div class="row">
-            <div class="form-group col-sm-6">
-              {{ form.weight.label }}
-              {{ form.weight(class="form-control", 
-                placeholder="Please enter patient's weight") }}
+    </div>
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-header">
+          <strong>Laboratory Exam</strong>
+          <small>Form</small>
+        </div>
+        <div class="card-body">
+          <div class="col-md-12">
+            <div class="form-group">
+              {{ lab_exam_form.stool_analysis.label }}
+              {{ lab_exam_form.stool_analysis(class="form-control") }}
             </div>
-            <div class="form-group col-sm-6">
-              {{ form.height.label }}
-              {{ form.height(class="form-control", 
-                placeholder="Please enter patient's height") }}
+            <div class="row">
+              <div class="form-group col-md-6">
+                {{ cbc_exam_form.red_blood_cell_count.label }}
+                {{ cbc_exam_form.red_blood_cell_count(class="form-control") }}
+              </div>
+              <div class="form-group col-md-6">
+                {{ cbc_exam_form.white_blood_cell_count.label }}
+                {{ cbc_exam_form.white_blood_cell_count(class="form-control") }}
+              </div>
             </div>
-          </div>
-          <div class="form-group">
-            {{ form.symptom.label }}
-            {{ form.symptom(class="form-control selectized", multiple="multiple",
-              placeholder="Enter symptoms") }}
-          </div>
-          <div class="row">
-            <div class="form-group col-sm-6">
-              {{ form.temperature.label }}
-              {{ form.temperature(class="form-control", 
-                placeholder="Enter patient's temperature.") }}
-            </div>
-            <div class="form-group col-sm-6">
-              {{ form.finding.label }}
-              {{ form.finding(class="form-control", 
-                placeholder="Please enter finding") }}
+            <div class="row">
+              <div class="form-group col-md-4">
+                {{ cbc_exam_form.platelet_count.label }}
+                {{ cbc_exam_form.platelet_count(class="form-control") }}
+              </div>
+              <div class="form-group col-md-4">
+                {{ cbc_exam_form.hemoglobin.label }}
+                {{ cbc_exam_form.hemoglobin(class="form-control") }}
+              </div>
+              <div class="form-group col-md-4">
+                {{ cbc_exam_form.hematocrit.label }}
+                {{ cbc_exam_form.hematocrit(class="form-control") }}
+              </div>
             </div>
           </div>
           {{ form.submit(class="btn btn-primary pull-right") }}
-        </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
+</form>
 {% endblock content %}
 
 {% block javascript %}
