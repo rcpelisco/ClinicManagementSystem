@@ -13,15 +13,18 @@ dashboard = Blueprint('dashboard', __name__)
 
 @dashboard.route('/', methods=['GET', 'POST'])
 def index():
-    return redirect(url_for('patients.index'))
+    return redirect(url_for('dashboard.kmeans'))
 
 @dashboard.route('/all', methods=['GET', 'POST'])
 def month():
     medical_records = MedicalRecord.query.all()    
-    medical_records_schema = RecordSchema(many=True, only=['findings', 'patient'])
+    medical_records_schema = RecordSchema(many=True, only=['findings', 
+        'patient', 'date'])
 
     output = medical_records_schema.dump(medical_records).data
     for record in output:
+        temp_date = datetime.strptime(record['date'], '%Y-%m-%dT%H:%M:%S+00:00')
+        record['date'] = int(datetime.strftime(temp_date, '%Y%m%d%H%M%S'))
         record['id'] = record['findings']['id']
         record['findings'] = record['findings']['findings']
         record['gender'] = 1 if record['patient']['gender'] == 'Male' else 2
@@ -31,44 +34,46 @@ def month():
     return jsonify(output)
     return redirect(url_for('patients.index'))
 
-@dashboard.route('/sklearn', methods=['GET'])
-def sklearn():
+@dashboard.route('/kmeans', methods=['GET'])
+def kmeans():
     medical_records = MedicalRecord.query.all()    
-    medical_records_schema = RecordSchema(many=True, only=['findings', 'patient'])
+    medical_records_schema = RecordSchema(many=True, only=['findings', 
+        'patient', 'date'])
     output = medical_records_schema.dump(medical_records).data
 
-    age = []
-    gender = []
+    x = []
+    y = []
     dataset = []
 
     for record in output:
-        age += [calculate_age(record['patient']['date_of_birth'])]
-        gender += [1 if record['patient']['gender'] == 'Male' else 2]
-        dataset += [[calculate_age(record['patient']['date_of_birth']), 
-            1 if record['patient']['gender'] == 'Male' else 2]]
-
-    plt.scatter(age, gender)
-    plt.show()
-
+        temp_date = datetime.strptime(record['date'], '%Y-%m-%dT%H:%M:%S+00:00')
+        
+        x += [calculate_age(record['patient']['date_of_birth'])]
+        y += [int(datetime.strftime(temp_date, '%Y%m%d'))]
+        dataset += [[calculate_age(record['patient']['date_of_birth']),
+            int(datetime.strftime(temp_date, '%Y%m%d'))]]
+            
     X = np.array(dataset)
-    kmeans = KMeans(n_clusters=3)
+    colors = ['g.', 'r.', 'b.']
+    kmeans = KMeans(n_clusters=len(colors))
     kmeans.fit(X)
 
     centroids = kmeans.cluster_centers_
     labels = kmeans.labels_
 
-    print(centroids)
-    print(labels)
-
-    colors = ['g.', 'r.', 'b.']
-
+    data = [[[] for k in range(len(colors))],[[] for k in range(len(colors))]]
     for i in range(len(X)):
-        print('Coordinate:', X[i][0], X[i][1], ', Label:', labels[i])
-        plt.plot(X[i][0], X[i][1], colors[labels[i]], markersize=10)
-
-    plt.scatter(centroids[:, 0], centroids[:, 1], marker='x', s=150, linewidths=5, zorder=10)
-    plt.show()
-    return jsonify(dataset)
+        plt.plot(X[i][0], X[i][1], labels[i], markersize=5)
+        data[0][int(labels[i])] += [[
+            int(X[i][0]), 
+            int(X[i][1])
+        ]]
+    for i in range(len(centroids)):
+        data[1][i] += [[
+            int(centroids[i][0]),
+            int(centroids[i][1])
+        ]]
+    return render_template('dashboard/index.html', data=data)
 
 def calculate_age(date_of_birth):
     today = date.today()

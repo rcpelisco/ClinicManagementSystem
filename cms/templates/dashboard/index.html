@@ -1,0 +1,93 @@
+{% extends "master.html" %}
+
+{% block stylesheet %}
+
+{% endblock stylesheet %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-5">
+            <h4 class="card-title mb-0">Disease Clustering</h4>
+            <div class="small text-muted">2018</div>
+          </div>
+        </div>
+        <hr>
+        <canvas id="kmeans" width="400" height="150"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='vendors/chart.js/dist/Chart.min.js') }}"></script>
+<script>
+    window.chartColors = {
+      red: 'rgb(255, 99, 132)',
+      orange: 'rgb(255, 159, 64)',
+      yellow: 'rgb(255, 205, 86)',
+      green: 'rgb(75, 192, 192)',
+      blue: 'rgb(54, 162, 235)',
+      purple: 'rgb(153, 102, 255)',
+      grey: 'rgb(201, 203, 207)'
+    };
+    
+		var color = Chart.helpers.color;
+		function generateData() {
+      let jsondata = JSON.parse("{{ data|safe }}");
+      let data = []
+      let dataset = []
+      let colorChoices = [window.chartColors.red, window.chartColors.blue, 
+        window.chartColors.yellow]
+      data['dataset'] = jsondata[0]
+      data['centroids'] = jsondata[1]
+      data['centroids'].forEach(function(e, i) {
+        dataset[data['dataset'].length + i] = {
+          borderColor: colorChoices[i],
+          backgroundColor: color(colorChoices[i]).alpha(0.2).rgbString(),
+          pointStyle: 'cross',
+          data: e.map(function(e) {
+            return {'x': e[0], 'y': e[1]}
+          })
+        }
+      })
+      data['dataset'].forEach(function(e, i) {
+        dataset[i] = {
+          label: 'Cluster ' + (i + 1),
+          borderColor: color(colorChoices[i]).alpha(0.4).rgbString(),
+          backgroundColor: color(colorChoices[i]).alpha(0.2).rgbString(),
+          data: e.map(function(e) {
+            return {'x': e[0], 'y': e[1]}
+          })
+        }
+      })
+      console.log(dataset)
+			return dataset;
+		}
+		var scatterChartData = {
+			datasets: generateData()
+		};
+
+		window.onload = function() {
+			var ctx = document.getElementById('kmeans').getContext('2d');
+			window.myScatter = Chart.Scatter(ctx, {
+				data: scatterChartData,
+				options: {
+					title: {
+						display: false,
+						text: 'Disease clustering using K Means'
+          },
+          legend: {
+            display: false
+          }
+				}
+			});
+		};
+
+		
+</script>
+{% endblock javascript %}

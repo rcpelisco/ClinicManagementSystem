@@ -53,7 +53,7 @@ class LabExam(db.Model):
     cbc_exam_id = db.Column(db.Integer, db.ForeignKey('cbc_exams.id'), 
         nullable=False)
     stool_exam = db.Column(db.String(10))
-    cbc_exam = db.relationship('CBCExam', backref='lab_exams')
+    cbc_exam = db.relationship('CBCExam', backref='lab_exams', cascade='delete')
 
 class CBCExam(db.Model):
     __tablename__ = 'cbc_exams'
