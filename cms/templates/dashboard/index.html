@@ -16,7 +16,11 @@
           </div>
         </div>
         <hr>
+        {% if data.clusters %}
+          Not enough samples to cluster
+        {% else %}
         <canvas id="kmeans" width="400" height="150"></canvas>
+        {% endif %}
       </div>
     </div>
   </div>

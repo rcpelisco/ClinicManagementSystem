@@ -41,27 +41,35 @@ def kmeans():
         'patient', 'date'])
     output = medical_records_schema.dump(medical_records).data
 
+    clusters = 3
+
+    if(len(output) < clusters):
+        data = {'clusters': True}
+        return render_template('dashboard/index.html', data=data)
     x = []
     y = []
     dataset = []
 
     for record in output:
+        today = datetime.today()
         temp_date = datetime.strptime(record['date'], '%Y-%m-%dT%H:%M:%S+00:00')
-        
-        x += [calculate_age(record['patient']['date_of_birth'])]
-        y += [int(datetime.strftime(temp_date, '%Y%m%d'))]
-        dataset += [[calculate_age(record['patient']['date_of_birth']),
-            int(datetime.strftime(temp_date, '%Y%m%d'))]]
+        temp_birth_date = datetime.strptime(record['patient']['date_of_birth'], '%Y-%m-%d')
+        date = today - temp_date
+        birth_date = today - temp_birth_date
+        x += [int(birth_date.days)]
+        y += [int(date.days)]
+        dataset += [[int(birth_date.days),
+            int(date.days)]]
             
     X = np.array(dataset)
-    colors = ['g.', 'r.', 'b.']
-    kmeans = KMeans(n_clusters=len(colors))
+    kmeans = KMeans(n_clusters=clusters)
+    
     kmeans.fit(X)
 
     centroids = kmeans.cluster_centers_
     labels = kmeans.labels_
 
-    data = [[[] for k in range(len(colors))],[[] for k in range(len(colors))]]
+    data = [[[] for k in range(clusters)],[[] for k in range(clusters)]]
     for i in range(len(X)):
         plt.plot(X[i][0], X[i][1], labels[i], markersize=5)
         data[0][int(labels[i])] += [[

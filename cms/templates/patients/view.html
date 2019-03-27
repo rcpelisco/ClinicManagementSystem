@@ -66,6 +66,11 @@
                         </td>
                       <td>{{ medical_record.findings.findings }}</td>
                       <td>
+                        <a href="{{ url_for('medical_records.view', 
+                          medical_record=medical_record.id) }}" 
+                          class="btn btn-sm btn-primary">
+                          View
+                        </a>
                         <a href="{{ url_for('medical_records.edit', 
                           medical_record=medical_record.id) }}" 
                           class="btn btn-sm btn-primary">

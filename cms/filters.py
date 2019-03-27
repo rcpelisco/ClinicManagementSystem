@@ -10,7 +10,7 @@ def format_date(value):
     return date_object.strftime('%B %d, %Y')
 
 def format_age(value):
-    dob = datetime.strptime(value, '%Y-%m-%d')
+    dob = datetime.strptime(str(value), '%Y-%m-%d')
     today = datetime.today()
     age = relativedelta(today, dob)
     return age.years

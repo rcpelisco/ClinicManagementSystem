@@ -7,63 +7,123 @@
   <div class="col-lg-12">
     <div class="card">
       <div class="card-body">
-        <h1>{{ patient.first_name }} {{ patient.last_name }}</h1>
+        <h1>{{ medical_record.patient.first_name }} {{ medical_record.patient.last_name }}</h1>
+        <h4>{{ medical_record.date|datetime }}</h4>
         <hr>
         <div class="row">
-          <div class="col-lg-4  border-right">
+          <div class="col-sm-4">
+            <h6>Basic</h6>
+            <hr>
             <div class="row">
-              <div class="col-lg-12">
-                <h3 class="display-inline-block">Personal Info</h3>
-                <a href="{{ url_for('patients.edit', patient=patient.id) }}">
-                  <button class="btn btn-sm btn-primary pull-right">Edit</button>
-                </a>
-                <div class="row">
-                  <div class="col-lg-4">Name:</div>
-                  <div class="col-lg-8">{{ patient.first_name }} 
-                    {{ patient.last_name }}</div>
-                </div>
-                <div class="row">
-                  <div class="col-lg-4">Date of birth:</div>
-                  <div class="col-lg-8">{{ patient.date_of_birth }}</div>
-                </div>
-                <div class="row">
-                  <div class="col-lg-4">Address:</div>
-                  <div class="col-lg-8">{{ patient.address }}</div>
-                </div>
+              <div class="col-sm-6">
+                Height:
+              </div>
+              <div class="col-sm-6">
+                {{ medical_record.height }} cm
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                Weight:
+              </div>
+              <div class="col-sm-6">
+                {{ medical_record.weight }} kg
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                Temperature:
+              </div>
+              <div class="col-sm-6">
+                {{ medical_record.temperature }} &#176;C
               </div>
             </div>
           </div>
-          <div class="col-lg-8">
+          <div class="col-sm-4">
+            <h6>Lab Exam</h6>
+            <hr>
             <div class="row">
-              <div class="col-lg-12">
-                <h3 class="display-inline-block">Medical Records</h3>
-                  <button class="btn btn-sm btn-primary pull-right">
-                    Add
-                  </button>
-                <table class="table table-sm">
-                  <thead>
-                    <th>Date</th>
-                    <th>Symptoms</th>
-                    <th>Findings</th>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>December 20, 2018</td>
-                      <td>Fever</td>
-                      <td>Influenza (flu)</td>
-                    </tr>
-                    <tr>
-                      <td>December 24, 2018</td>
-                      <td>Headache</td>
-                      <td>Influenza (flu)</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="col-sm-6">
+                Stool Analysis:
+              </div>
+              <div class="col-sm-6">
+                {{ medical_record.lab_exam.stool_exam|capitalize }}
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <h6>CBC Exam</h6>
+            <hr>
+            <div class="row">
+              <div class="col-sm-6">
+                Hematocrit:
+              </div>
+              <div class="col-sm-6">
+                {{ medical_record.lab_exam.cbc_exam.hematocrit }}%
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                Platelet Count:
+              </div>
+              <div class="col-sm-6">
+                {{ medical_record.lab_exam.cbc_exam.platelet_count }} (billion/L)
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                Red Blood Cell Count:
+              </div>
+              <div class="col-sm-6">
+                {{ medical_record.lab_exam.cbc_exam.red_blood_cell_count }} (trillion cells/L)
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                White Blood Cell Count:
+              </div>
+              <div class="col-sm-6">
+                {{ medical_record.lab_exam.cbc_exam.white_blood_cell_count }} (billion cells/L)
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                Hemoglobin:
+              </div>
+              <div class="col-sm-6">
+                {{ medical_record.lab_exam.cbc_exam.hemoglobin }} (grams/dL)
               </div>
             </div>
           </div>
         </div>
+        <hr>
+        <div class="row">
+          <div class="col-sm-4">
+            <h6>Symptoms</h6>
+            <hr>
+            {% for symptom in medical_record.symptoms %}
+            <div class="row">
+              <div class="col-sm-12">
+                {{ loop.index }}. {{ symptom.symptom }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="col-sm-8">
+            <h6>Findings</h6>
+            <hr>
+            <div class="row">
+              <div class="col-sm-12">
+                {{ medical_record.findings.findings }}</div>
+            </div>
+          </div>
+        </div>
+        <hr>
+        <a href="{{ url_for('medical_records.print', 
+          medical_record=medical_record.id) }}" class="btn btn-primary pull-right"
+          target="blank">
+          Print</a>
       </div>
+    </div>
   </div>
 </div>
 {% endblock content %}

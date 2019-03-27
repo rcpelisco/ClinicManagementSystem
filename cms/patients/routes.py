@@ -18,6 +18,7 @@ def view(patient):
     patient = Patient.query.get(patient)
     patient_schema = PatientSchema()
     output = patient_schema.dump(patient).data
+    # return jsonify(output)
     return render_template('patients/view.html', patient=patient)
 
 @patients.route('/create', methods=['GET'])
@@ -33,7 +34,8 @@ def save():
             last_name=form.last_name.data,
             gender=form.gender.data,
             date_of_birth=form.date_of_birth.data,
-            address=form.address.data)
+            address=form.address.data,
+            contact_no=form.contact_no.data)
         db.session.add(patient)
         db.session.commit()
         return redirect(url_for('patients.index'))
@@ -56,6 +58,7 @@ def update():
         patient.last_name = form.last_name.data
         patient.date_of_birth = form.date_of_birth.data
         patient.address = form.address.data
+        patient.contact_no = form.contact_no.data
         
         db.session.commit()
         return redirect(url_for('patients.view', patient=patient.id))

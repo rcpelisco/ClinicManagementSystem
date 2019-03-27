@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    .text-center {
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <table>
+    <tbody>
+      <tr>
+        <td colspan="4">
+          <h1 class="text-center">Medical Record Report</h1>
+          <hr>
+        </td>
+      </tr>
+      <tr>
+        <td>Date: </td>
+        <td colspan="3">{{ medical_record.date|datetime }}</td>
+      </tr>
+      <tr>
+        <td colspan="4" height="50px">
+          <hr>
+          <h3 class="text-center">Personal Information</h3>
+          <hr>
+        </td>
+      </tr>
+      <tr>
+        <td>Name: </td>
+        <td>{{ medical_record.patient.first_name }} 
+          {{ medical_record.patient.last_name }}</td>
+          
+        <td>Contact no: </td>
+        <td>{{ medical_record.patient.contact_no }}</td>
+      </tr>
+      <tr>
+        <td>Date of Birth: </td>
+        <td>{{ medical_record.patient.date_of_birth|date }}</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Gender: </td>
+        <td>{{ medical_record.patient.gender|capitalize }}</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Address: </td>
+        <td>{{ medical_record.patient.address }}</td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <table>
+    <tbody>
+      <tr>
+        <td colspan="6" height="50px">
+          <hr>
+          <h3 class="text-center">Medical Record</h3>
+          <hr>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" width="50%"><strong>Basic</strong><hr></td>
+        <td colspan="2"><strong>Lab Exam</strong><hr></td>
+      </tr>
+      <tr>
+        <td style="padding-left: 25px">Height: </td>
+        <td>{{ medical_record.height }} cm</td>
+        <td style="padding-left: 25px">Stool Analysis:</td>
+        <td>{{ medical_record.lab_exam.stool_exam|capitalize }}</td>
+      </tr>
+      <tr>
+        <td style="padding-left: 25px">Weight: </td>
+        <td>{{ medical_record.weight }} kg</td>
+        <td colspan="2"><hr><strong>CBC Exam</strong><hr></td>
+      </tr>
+      <tr>
+        <td style="padding-left: 25px">Temperature: </td>
+        <td>{{ medical_record.temperature }} &#176;C</td>
+        <td style="padding-left: 25px">Hematocrit: </td>
+        <td>{{ medical_record.lab_exam.cbc_exam.hematocrit }} %</td>
+      </tr>
+      <tr>
+        <td colspan="2"></td>
+        <td style="padding-left: 25px">Platelet Count:</td>
+        <td>{{ medical_record.lab_exam.cbc_exam.platelet_count }} (billion/L)</td>
+      </tr>
+      <tr>
+        <td colspan="2"></td>
+        <td style="padding-left: 25px">Red Blood Cell Count:</td>
+        <td>{{ medical_record.lab_exam.cbc_exam.red_blood_cell_count }} (trillion cells/L)</td>
+      </tr>
+      <tr>
+        <td colspan="2"></td>
+        <td style="padding-left: 25px">White Blood Cell Count:</td>
+        <td>{{ medical_record.lab_exam.cbc_exam.white_blood_cell_count }} (billion cells/L)</td>
+      </tr>
+      <tr>
+        <td colspan="2"></td>
+        <td style="padding-left: 25px">Hemoglobin:</td>
+        <td>{{ medical_record.lab_exam.cbc_exam.hemoglobin }} (grams/dL)</td>
+      </tr>
+      <tr>
+        <td colspan="2"></td>
+        <td colspan="2"><hr><strong>Symptoms</strong><hr></td>
+      </tr>
+      {% for symptom in medical_record.symptoms %}
+      <tr>
+        <td colspan="2"></td>
+        <td colspan="2" style="padding-left: 25px">
+          {{ loop.index }}. {{ symptom.symptom }}</td>  
+      </tr>
+      {% endfor %}  
+      <tr>
+        <td></td>
+        <td></td>
+        <td colspan="2"><hr><strong>Findings</strong><hr></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td colspan="2" style="padding-left: 25px">
+          {{ medical_record.findings.findings }}</td>
+      </tr>
+      <tr>
+        <td colspan="4" height="25px"><hr></td>
+      </tr>
+    </tbody>
+  </table>
+  <hr>
+  <br>
+  <br>
+  <table>
+    <tbody>
+      <tr>
+        <td><u>{{ medical_record.doctor.name }}</u></td>
+      </tr>
+      <tr>
+        <td>Doctor</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+
+</html>

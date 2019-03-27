@@ -23,7 +23,7 @@ class Patient(db.Model):
     gender = db.Column(db.String(50), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
     address = db.Column(db.String(255), nullable=False)
-    # medical_records = db.relationship('MedicalRecord', backref='patients')
+    contact_no = db.Column(db.String(20))
 
 class MedicalRecord(db.Model):
     __tablename__ = 'medical_records'
@@ -32,24 +32,26 @@ class MedicalRecord(db.Model):
         nullable=False)
     doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     findings_id = db.Column(db.Integer, db.ForeignKey('findings.id'), nullable=False)
+    lab_exam_id = db.Column(db.Integer, db.ForeignKey('lab_exams.id'), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.now)
     height = db.Column(db.String(7), nullable=False)
     weight = db.Column(db.String(7), nullable=False)
     temperature = db.Column(db.String(7), nullable=False)
     paid = db.Column(db.Boolean, nullable=False, default=False)
     findings = db.relationship('Findings', backref='medical_records',
-        cascade='delete')
+        cascade='all, delete')
     symptoms = db.relationship('Symptom',  backref='medical_records', 
-        cascade='delete')
+        cascade='all, delete')
     patient = db.relationship('Patient', backref='medical_records')
     lab_exam = db.relationship('LabExam', backref='medical_records', 
-        cascade='delete')
+        cascade='all, delete')
+    doctor = db.relationship('User', backref='medical_records')
 
 class LabExam(db.Model):
     __tablename__ = 'lab_exams'
     id = db.Column(db.Integer, primary_key=True)
-    medical_record_id = db.Column(db.Integer, 
-        db.ForeignKey('medical_records.id'), nullable=False)
+    # medical_record_id = db.Column(db.Integer, 
+    #     db.ForeignKey('medical_records.id'), nullable=False)
     cbc_exam_id = db.Column(db.Integer, db.ForeignKey('cbc_exams.id'), 
         nullable=False)
     stool_exam = db.Column(db.String(10))
@@ -112,11 +114,12 @@ class AppointmentSchema(ma.ModelSchema):
         model = Appointment
 
 class MedicalRecordSchema(ma.ModelSchema):
-    doctor = fields.Nested('UserSchema')
+    doctor = fields.Nested('UserSchema', only=['name'])
     symptoms = fields.Nested('SymptomSchema', many=True, 
         exclude=('medical_records',))
     findings = fields.Nested('FindingsSchema', exclude=('medical_records',))
     patient = fields.Nested('PatientSchema', exclude=('medical_records',))
+    lab_exam = fields.Nested('LabExamSchema', exclude=('medical_records',))
     class Meta:
         model = MedicalRecord
 
@@ -133,3 +136,12 @@ class RecordSchema(ma.ModelSchema):
     patient = fields.Nested('PatientSchema', only=['gender', 'date_of_birth'])
     class Meta:
         model = MedicalRecord
+
+class LabExamSchema(ma.ModelSchema):
+    cbc_exam = fields.Nested('CBCExamSchema', exclude=('lab_exams',))
+    class Meta:
+        model = LabExam
+
+class CBCExamSchema(ma.ModelSchema):
+    class Meta:
+        model = CBCExam

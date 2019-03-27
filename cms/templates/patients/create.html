@@ -43,10 +43,17 @@
               {{ form.gender(class="form-control") }}
             </div>
           </div>
-          <div class="form-group">
-            {{ form.address.label }}
-            {{ form.address(class="form-control", 
-              placeholder="Please enter patient's address") }}
+          <div class="row">
+            <div class="form-group col-sm-4">
+              {{ form.contact_no.label }}
+              {{ form.contact_no(class="form-control", 
+                placeholder="Enter contact no.") }}
+            </div>
+            <div class="form-group col-sm-8">
+              {{ form.address.label }}
+              {{ form.address(class="form-control", 
+                placeholder="Enter contact no.") }}
+            </div>
           </div>
           {{ form.submit(class="btn btn-primary pull-right") }}
         </div>
