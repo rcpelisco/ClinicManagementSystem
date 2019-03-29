@@ -46,7 +46,7 @@ def index():
     for result in male_result:
         statistics['patient_count']['male'] += result.case_count
         statistics['findings'] += [{ 'name' : result.findings, 
-            'male_count': result.case_count }]
+            'male_count': result.case_count, 'female_count': 0 }]
 
     for result in female_result:
         statistics['patient_count']['female'] += result.case_count
