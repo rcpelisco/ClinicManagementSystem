@@ -19,4 +19,5 @@ class CreatePatientForm(FlaskForm):
  
 class EditPatientForm(CreatePatientForm):
     id = IntegerField(widget=HiddenInput())
+    submit = SubmitField('Save Changes')
     

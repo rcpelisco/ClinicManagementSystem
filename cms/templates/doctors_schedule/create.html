@@ -19,9 +19,9 @@
       </div>
       <div class="card-body">
         <form action="{{ url_for('doctors_schedule.save') }}" method="post">  
-            {% if form.errors %}
-              {{ form.errors }}
-            {% endif %}
+          {% if form.errors %}
+            {{ form.errors }}
+          {% endif %}
           {{ form.hidden_tag() }}
           <div class="form-group">
             <label for="patient">Patient</label>

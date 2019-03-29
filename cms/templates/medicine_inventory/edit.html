@@ -10,32 +10,22 @@
   <div class="col-sm-6">
     <div class="card">
       <div class="card-header">
-        <strong>Patients</strong>
+        <strong>Medicine</strong>
         <small>Form</small>
       </div>
       <div class="card-body">
-        <form action="{{ url_for('patients.update') }}" method="post">  
+        <form action="{{ url_for('medicine_inventory.update') }}" method="post">  
           {{ form.hidden_tag() }}
           {{ form.id() }}
           <div class="row">
             <div class="form-group col-sm-6">
-              <label for="first_name">First name</label>
-              {{ form.first_name(class="form-control", 
-                placeholder="Please enter patient's first name") }}
+              {{ form.name.label }}
+              {{ form.name(class="form-control") }}
             </div>
             <div class="form-group col-sm-6">
-              <label for="last_name">Last name</label>
-              {{ form.last_name(class="form-control", 
-                placeholder="Please enter patient's last name") }}
+              {{ form.count.label }}
+              {{ form.count(class="form-control") }}
             </div>
-          </div>
-          <div class="form-group">
-            <label for="date_of_birth">Date of Birth</label>
-            {{ form.date_of_birth(class="form-control") }}
-          </div>
-          <div class="form-group">
-            <label for="address">Address</label>
-            {{ form.address(class="form-control") }}
           </div>
           {{ form.submit(class="btn btn-primary pull-right") }}
         </div>

@@ -32,7 +32,7 @@ def view(medical_record):
         medical_record=medical_record)
 
 @medical_records.route('/<medical_record>/print', methods=['GET'])
-def print(medical_record):
+def print_report(medical_record):
     options = {
         'page-size': 'A4',
         'margin-top': '0.5in',
@@ -41,12 +41,9 @@ def print(medical_record):
         'margin-left': '1in',
     }
 
-    medical_record = MedicalRecord.query.get(medical_record)  
-    # medical_record_schema = MedicalRecordSchema()
-    # output = medical_record_schema.dump(medical_record).data
-    # return jsonify(output)
-
-    template = render_template('medical_records/print.html', medical_record=medical_record)
+    medical_record = MedicalRecord.query.get(medical_record)
+    template = render_template('medical_records/print.html', 
+        medical_record=medical_record)
     pdf = pdfkit.from_string(template, False, options=options)
     
     response = make_response(pdf)
@@ -138,7 +135,6 @@ def edit(medical_record):
             .filter(Symptom.medical_record_id == medical_record.id).delete()
         db.session.commit()
         for data in form.symptom.data:
-            print(data)
             symptom = Symptom(medical_record_id=medical_record.id, symptom=data)
             db.session.add(symptom)
         db.session.commit()

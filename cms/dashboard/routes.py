@@ -57,12 +57,7 @@ def index():
         for entry in statistics['findings']:
             if(entry['name'] == result.findings):
                 entry['female_count'] = result.case_count
-    
-
-    #     statistics[result.findings] = { 'male': result.case_count }
-    # for result in female_result:
-    #     statistics[result.findings]['female'] = result.case_count
-
+                
     print(statistics)
     # return ''
     clusters = 3

@@ -24,6 +24,7 @@
             <th>Last stocked</th>
             <th>Name</th>
             <th>Count</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -32,10 +33,50 @@
             <td>{{ medicine.last_stocked|date }}</td>
             <td>{{ medicine.name }}</td>
             <td>{{ medicine.count }}</td>
+            <td>
+              <button class="btn btn-primary btn-sm btn-deduct" data-toggle="modal" 
+                data-id="{{ medicine.id }}"
+                data-target="#exampleModal">
+                Deduct
+              </button>
+              <a href="{{ url_for('medicine_inventory.edit', 
+                medicine=medicine.id) }}" class="btn btn-primary btn-sm">
+                Edit
+              </a>
+              <a href="{{ url_for('medicine_inventory.delete', 
+                medicine=medicine.id) }}" class="btn btn-danger btn-sm">
+                Delete
+              </a>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form action="/" method="post">
+        {{ form.hidden_tag() }}
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Deduct medicine count</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            {{ form.count.label }}
+            {{ form.count(class="form-control") }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          {{ form.submit(class="btn btn-primary pull-right") }}
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -49,6 +90,10 @@
     $('#patients-table').DataTable({
       paging: false,
       searching: false
+    })
+    $('.btn-deduct').click(function() {
+      let medicine_id = $(this).attr('data-id')
+      $('form').attr('action', "{{ url_for('medicine_inventory.index') }}" + medicine_id + '/deduct')
     })
   })
 </script>

@@ -10,7 +10,14 @@ class CreateMedicineForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(min=2)])
     count = IntegerField('Count', validators=[DataRequired()])
     submit = SubmitField('Add Medicine')
+
+class DeductMedicineForm(FlaskForm):
+    count = IntegerField('Count', validators=[DataRequired()])
+    submit = SubmitField('Save Changes')
  
-class EditMedicineForm(CreateMedicineForm):
+class EditMedicineForm(FlaskForm):
     id = IntegerField(widget=HiddenInput())
+    name = StringField('Name', validators=[DataRequired(), Length(min=2)])
+    count = IntegerField('Count', validators=[DataRequired()])
+    submit = SubmitField('Save Changes')
     
