@@ -24,25 +24,31 @@ class Patient(db.Model):
     date_of_birth = db.Column(db.Date, nullable=False)
     address = db.Column(db.String(255), nullable=False)
     contact_no = db.Column(db.String(20))
+    medical_records = db.relationship('MedicalRecord', backref='patient',
+        cascade='all, delete')
 
 class MedicalRecord(db.Model):
     __tablename__ = 'medical_records'
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'), 
         nullable=False)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    findings_id = db.Column(db.Integer, db.ForeignKey('findings.id'), nullable=False)
-    lab_exam_id = db.Column(db.Integer, db.ForeignKey('lab_exams.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'), 
+        nullable=False)
+    findings_id = db.Column(db.Integer, db.ForeignKey('findings.id'), 
+        nullable=False)
+    lab_exam_id = db.Column(db.Integer, db.ForeignKey('lab_exams.id'), 
+        nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.now)
     height = db.Column(db.String(7), nullable=False)
     weight = db.Column(db.String(7), nullable=False)
     temperature = db.Column(db.String(7), nullable=False)
     paid = db.Column(db.Boolean, nullable=False, default=False)
+
+    # patient = db.relationship('MedicalRecord', back_populates='medical_records')
     findings = db.relationship('Findings', backref='medical_records',
         cascade='all, delete')
     symptoms = db.relationship('Symptom',  backref='medical_records', 
         cascade='all, delete')
-    patient = db.relationship('Patient', backref='medical_records')
     lab_exam = db.relationship('LabExam', backref='medical_records', 
         cascade='all, delete')
     doctor = db.relationship('User', backref='medical_records')
@@ -50,8 +56,6 @@ class MedicalRecord(db.Model):
 class LabExam(db.Model):
     __tablename__ = 'lab_exams'
     id = db.Column(db.Integer, primary_key=True)
-    # medical_record_id = db.Column(db.Integer, 
-    #     db.ForeignKey('medical_records.id'), nullable=False)
     cbc_exam_id = db.Column(db.Integer, db.ForeignKey('cbc_exams.id'), 
         nullable=False)
     stool_exam = db.Column(db.String(10))

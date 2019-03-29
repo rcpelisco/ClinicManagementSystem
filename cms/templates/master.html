@@ -15,8 +15,6 @@
     <link href="{{ url_for('static', filename='vendors/simple-line-icons/css/simple-line-icons.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='vendors/pace-progress/css/pace.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='vendors/dataTables/css/dataTables.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='vendors/selectize/dist/css/selectize.bootstrap3.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
     {% block stylesheet %}
     {% endblock stylesheet %}
@@ -33,7 +31,7 @@
       <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <ul class="nav navbar-nav d-md-down-none">
+      <!-- <ul class="nav navbar-nav d-md-down-none">
         <li class="nav-item px-3">
           <a class="nav-link" href="#">Dashboard</a>
         </li>
@@ -43,7 +41,7 @@
         <li class="nav-item px-3">
           <a class="nav-link" href="#">Settings</a>
         </li>
-      </ul>
+      </ul> -->
       {% include "user-menu.html" %}
     </header>
     <div class="app-body">
@@ -76,9 +74,6 @@
     <script src="{{ url_for('static', filename='vendors/perfect-scrollbar/dist/perfect-scrollbar.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendors/@coreui/coreui/dist/js/coreui.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendors/@coreui/coreui-plugin-chartjs-custom-tooltips/dist/js/custom-tooltips.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='vendors/dataTables/js/dataTables.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='vendors/selectize/dist/js/selectize.min.js') }}"></script>
-    {# <script src="{{ url_for('static', filename='js/main.js') }}"></script> #}
     {% block javascript %}
     {% endblock javascript %}
   </body>

@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify
 from datetime import date, datetime
 from cms import db
-from cms.models import RecordSchema
-from cms.models import MedicalRecord
+from cms.models import MedicalRecord, Patient
+from cms.models import RecordSchema, PatientSchema
+from sqlalchemy import text 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import style
@@ -11,9 +12,102 @@ from sklearn.cluster import KMeans
 
 dashboard = Blueprint('dashboard', __name__)
 
+def get_statistics(gender):
+    sql = text('''SELECT
+            `findings`.`findings`,
+            COUNT(`findings`.`findings`) as `case_count`
+        FROM
+            `findings`,
+            `medical_records`,
+            `patients`
+        WHERE
+            `medical_records`.`patient_id` = `patients`.`id` AND 
+            `medical_records`.`findings_id` = `findings`.`id` AND
+            `patients`.`gender` = '{}'
+        GROUP BY 
+            `findings`.`findings`'''.format(gender))
+    result = db.engine.execute(sql)
+    return result
+
 @dashboard.route('/', methods=['GET', 'POST'])
 def index():
-    return redirect(url_for('dashboard.kmeans'))
+    medical_records = MedicalRecord.query.all()    
+    medical_records_schema = RecordSchema(many=True, only=['findings', 
+        'patient', 'date'])
+    output = medical_records_schema.dump(medical_records).data
+    male_count = Patient.query.filter(Patient.gender == 'male').count()
+    female_count = Patient.query.filter(Patient.gender == 'female').count()
+
+    male_result = get_statistics('male')
+    female_result = get_statistics('female')
+    
+    statistics = {'findings': [], 'patient_count': {'male': 0, 'female': 0}}
+
+    for result in male_result:
+        statistics['patient_count']['male'] += result.case_count
+        statistics['findings'] += [{ 'name' : result.findings, 
+            'male_count': result.case_count }]
+
+    for result in female_result:
+        statistics['patient_count']['female'] += result.case_count
+        if not any(entry['name'] == 
+            result.findings for entry in statistics['findings']):
+            statistics['findings'] += [{ 'name' : result.findings, 'male_count': 0, 
+                'female_count': result.case_count }]
+        for entry in statistics['findings']:
+            if(entry['name'] == result.findings):
+                entry['female_count'] = result.case_count
+    
+
+    #     statistics[result.findings] = { 'male': result.case_count }
+    # for result in female_result:
+    #     statistics[result.findings]['female'] = result.case_count
+
+    print(statistics)
+    # return ''
+    clusters = 3
+
+    if(len(output) < clusters):
+        data = {'clusters': True}
+        return render_template('dashboard/index.html', data=data, 
+            statistics=statistics)
+    x = []
+    y = []
+    dataset = []
+
+    for record in output:
+        today = datetime.today()
+        temp_date = datetime.strptime(record['date'], '%Y-%m-%dT%H:%M:%S+00:00')
+        temp_birth_date = datetime.strptime(record['patient']['date_of_birth'], 
+            '%Y-%m-%d')
+        date = today - temp_date
+        birth_date = today - temp_birth_date
+        x += [int(birth_date.days)]
+        y += [int(date.days)]
+        dataset += [[int(birth_date.days),
+            int(date.days)]]
+            
+    X = np.array(dataset)
+    kmeans = KMeans(n_clusters=clusters)
+    
+    kmeans.fit(X)
+
+    centroids = kmeans.cluster_centers_
+    labels = kmeans.labels_
+    data = [[[] for k in range(clusters)],[[] for k in range(clusters)]]
+    for i in range(len(X)):
+        plt.plot(X[i][0], X[i][1], labels[i], markersize=5)
+        data[0][int(labels[i])] += [[
+            int(X[i][0]), 
+            int(X[i][1])
+        ]]
+    for i in range(len(centroids)):
+        data[1][i] += [[
+            int(centroids[i][0]),
+            int(centroids[i][1])
+        ]]
+    return render_template('dashboard/index.html', data=data, 
+        statistics=statistics)
 
 @dashboard.route('/all', methods=['GET', 'POST'])
 def month():
@@ -36,52 +130,7 @@ def month():
 
 @dashboard.route('/kmeans', methods=['GET'])
 def kmeans():
-    medical_records = MedicalRecord.query.all()    
-    medical_records_schema = RecordSchema(many=True, only=['findings', 
-        'patient', 'date'])
-    output = medical_records_schema.dump(medical_records).data
-
-    clusters = 3
-
-    if(len(output) < clusters):
-        data = {'clusters': True}
-        return render_template('dashboard/index.html', data=data)
-    x = []
-    y = []
-    dataset = []
-
-    for record in output:
-        today = datetime.today()
-        temp_date = datetime.strptime(record['date'], '%Y-%m-%dT%H:%M:%S+00:00')
-        temp_birth_date = datetime.strptime(record['patient']['date_of_birth'], '%Y-%m-%d')
-        date = today - temp_date
-        birth_date = today - temp_birth_date
-        x += [int(birth_date.days)]
-        y += [int(date.days)]
-        dataset += [[int(birth_date.days),
-            int(date.days)]]
-            
-    X = np.array(dataset)
-    kmeans = KMeans(n_clusters=clusters)
-    
-    kmeans.fit(X)
-
-    centroids = kmeans.cluster_centers_
-    labels = kmeans.labels_
-
-    data = [[[] for k in range(clusters)],[[] for k in range(clusters)]]
-    for i in range(len(X)):
-        plt.plot(X[i][0], X[i][1], labels[i], markersize=5)
-        data[0][int(labels[i])] += [[
-            int(X[i][0]), 
-            int(X[i][1])
-        ]]
-    for i in range(len(centroids)):
-        data[1][i] += [[
-            int(centroids[i][0]),
-            int(centroids[i][1])
-        ]]
-    return render_template('dashboard/index.html', data=data)
+    pass
 
 def calculate_age(date_of_birth):
     today = date.today()

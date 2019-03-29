@@ -1,5 +1,9 @@
 {% extends "master.html" %}
 
+{% block stylesheet %}
+<link href="{{ url_for('static', filename='vendors/dataTables/css/dataTables.min.css') }}" rel="stylesheet">
+{% endblock stylesheet %}
+
 {% block content %}
 <div class="row">
   <div class="col-sm-12">
@@ -55,6 +59,7 @@
 {% endblock content %}
 
 {% block javascript %}
+<script src="{{ url_for('static', filename='vendors/dataTables/js/dataTables.min.js') }}"></script>
 <script>
   $(function() {
     $('#patients-table').DataTable()

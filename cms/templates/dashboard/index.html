@@ -12,7 +12,7 @@
         <div class="row">
           <div class="col-sm-5">
             <h4 class="card-title mb-0">Disease Clustering</h4>
-            <div class="small text-muted">2018</div>
+            <div class="small text-muted">Ckustered data of diseases</div>
           </div>
         </div>
         <hr>
@@ -21,6 +21,81 @@
         {% else %}
         <canvas id="kmeans" width="400" height="150"></canvas>
         {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-8">
+            <h4 class="card-title mb-0">Statistics</h4>
+            <div class="small text-muted">Statistical report of all the medical records issued.</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <hr class="mt-0">
+            {% for findings in statistics.findings %}
+            <div class="progress-group mb-3">
+              <div class="progress-group-prepend">
+                <span class="progress-group-text">{{ findings.name }}</span>
+              </div>
+              <div class="progress-group-bars">
+                <div class="progress-group-header">
+                  <i class="icon-user progress-group-icon"></i>
+                  <div>Male</div>
+                  <div class="ml-auto font-weight-bold mr-2">{{ findings.male_count }}</div>
+                  <div class="text-muted small">({{ ((findings.male_count/(findings.male_count + findings.female_count))*100)|round(2) }}%)</div>
+                </div>
+                <div class="progress progress-xs">
+                  <div class="progress-bar bg-info" role="progressbar" style="width: {{ (findings.male_count/(findings.male_count + findings.female_count))*100 }}%" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="progress-group-header">
+                  <i class="icon-user-female progress-group-icon"></i>
+                  <div>Female</div>
+                  <div class="ml-auto font-weight-bold mr-2">{{ findings.female_count }}</div>
+                  <div class="text-muted small">({{ ((findings.female_count/(findings.male_count + findings.female_count))*100)|round(2) }}%)</div>
+                </div>
+                <div class="progress progress-xs">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: {{ (findings.female_count/(findings.male_count + findings.female_count))*100 }}%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-8">
+            <h4 class="card-title mb-0">Number of patients</h4>
+            <div class="small text-muted">Number of patients diagnosed in this clinic</div>
+          </div>
+        </div>
+        <hr class="mt-0">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="callout callout-info">
+              <small class="text-muted">Male</small>
+              <br>
+              <strong class="h4">{{ statistics.patient_count.male }}</strong>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="callout callout-danger">
+              <small class="text-muted">Female</small>
+              <br>
+              <strong class="h4">{{ statistics.patient_count.female }}</strong>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

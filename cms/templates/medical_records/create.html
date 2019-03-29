@@ -2,6 +2,7 @@
 
 {% block stylesheet %}
 <link href="{{ url_for('static', filename='vendors/tempusdominus-datetimepicker/css/main.min.css') }}" rel="stylesheet">  
+<link href="{{ url_for('static', filename='vendors/selectize/dist/css/selectize.bootstrap3.min.css') }}" rel="stylesheet">
 {% endblock stylesheet %}
 
 {% block content %}
@@ -111,6 +112,7 @@
 {% endblock content %}
 
 {% block javascript %}
+<script src="{{ url_for('static', filename='vendors/selectize/dist/js/selectize.min.js') }}"></script>
 <script src="{{ url_for('static', filename='vendors/moment/moment.js') }}"></script>
 <script src="{{ url_for('static', filename='vendors/tempusdominus-datetimepicker/js/main.min.js') }}"></script>
 <script>
