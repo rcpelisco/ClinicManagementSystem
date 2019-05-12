@@ -10,6 +10,8 @@ medicine_inventory = Blueprint('medicine_inventory', __name__)
 
 @medicine_inventory.route('/', methods=['GET'])
 def index():
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     medicines = Medicine.query.all()
     deduct_form = DeductMedicineForm()
     return render_template('medicine_inventory/index.html', 
@@ -17,12 +19,16 @@ def index():
 
 @medicine_inventory.route('/<medicine>', methods=['GET'])
 def view(medicine):
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     medical_record = MedicalRecord.query.get(medical_record)
     return render_template('medicine_inventory/view.html', 
         medical_record=medical_record)
 
 @medicine_inventory.route('/create', methods=['GET'])
 def create():
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     form = CreateMedicineForm()
     return render_template('medicine_inventory/create.html', form=form)
 
@@ -40,6 +46,8 @@ def save():
 
 @medicine_inventory.route('/<medicine>/edit', methods=['GET'])
 def edit(medicine):
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     medicine = Medicine.query.get(medicine)
     form = EditMedicineForm(obj = medicine)
     return render_template('medicine_inventory/edit.html', medicine=medicine, 
@@ -70,6 +78,8 @@ def deduct(medicine):
 
 @medicine_inventory.route('<medicine>/delete/', methods=['GET'])
 def delete(medicine):
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     medicine = Medicine.query.get(int(medicine))
     db.session.delete(medicine)
     db.session.commit()

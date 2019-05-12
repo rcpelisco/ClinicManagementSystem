@@ -1,6 +1,7 @@
 <div class="sidebar">
   <nav class="sidebar-nav">
     <ul class="nav">
+      {% if current_user.position != 'patient' %}
       <li class="nav-item">
         <a class="nav-link" href="{{ url_for('dashboard.index') }}">
           <i class="nav-icon icon-graph"></i> Cluster Graph
@@ -15,9 +16,19 @@
           <i class="nav-icon icon-user"></i> Doctors' Schedule</a>
       </li>
       <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('doctors_schedule.appointments') }}">
+          <i class="nav-icon icon-user"></i> Appointments</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" href="{{ url_for('medicine_inventory.index') }}">
           <i class="nav-icon icon-layers"></i> Medicine Inventory</a>
       </li>
+      {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('front_page.index') }}">
+          <i class="nav-icon icon-layers"></i>User info</a>
+      </li>
+      {% endif %}
     </ul>
   </nav>
   <button class="sidebar-minimizer brand-minimizer" type="button"></button>

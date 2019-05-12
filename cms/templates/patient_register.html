@@ -1,0 +1,134 @@
+{% extends "master-external.html" %}
+
+{% block stylesheet %}
+<link href="{{ url_for('static', filename='vendors/tempusdominus-datetimepicker/css/main.min.css') }}" rel="stylesheet">  
+{% endblock stylesheet %}
+
+{% block content %}
+<div class="col-md-8">
+  <div class="card mx-4">
+    <div class="card-body p-4">
+      <form action="{{ url_for('users.patient_register') }}" method="POST">
+        {{ form.hidden_tag() }}
+        <h1>Register</h1>
+        <p class="text-muted">Create your account</p>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="icon-user"></i>
+                </span>
+              </div>
+              {{ form.first_name(class="form-control", 
+                placeholder=form.first_name.label.text) }}
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="icon-user"></i>
+                </span>
+              </div>
+              {{ form.last_name(class="form-control", 
+                placeholder=form.last_name.label.text) }}
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="icon-user"></i>
+                </span>
+              </div>
+              {{ form.username(class="form-control", 
+                placeholder=form.username.label.text) }}
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="icon-lock"></i>
+                </span>
+              </div>
+              {{ form.password(class="form-control", 
+                placeholder=form.password.label.text) }}
+            </div>
+            <div class="input-group mb-10px">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="icon-lock"></i>
+                </span>
+              </div>
+              {{ form.confirm_password(class="form-control", 
+                placeholder=form.confirm_password.label.text) }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="icon-user"></i>
+                </span>
+              </div>
+              {{ form.gender(class="form-control", 
+                placeholder=form.gender.label.text) }}
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="icon-calendar"></i>
+                </span>
+              </div>
+              {{ form.date_of_birth(class="form-control datetimepicker-input",
+                data_toggle="datetimepicker", data_target="#date_of_birth") }}
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="icon-home"></i>
+                </span>
+              </div>
+              {{ form.address(class="form-control", 
+                placeholder=form.address.label.text) }}
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="icon-phone"></i>
+                </span>
+              </div>
+              {{ form.contact_no(class="form-control", 
+                placeholder=form.contact_no.label.text) }}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <button class="btn btn-success float-right" type="submit">
+              Create Account
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer p-4">
+      <div class="row">
+        <div class="col-12">
+          <p>Already have an account? Login 
+            <a href="{{ url_for('users.login') }}">here.</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='vendors/moment/moment.js') }}"></script>
+<script src="{{ url_for('static', filename='vendors/tempusdominus-datetimepicker/js/main.min.js') }}"></script>
+<script>
+  $(function () {
+    $('#date_of_birth').datetimepicker({
+      format: 'YYYY-MM-DD'
+    })
+  })
+</script>
+{% endblock javascript %}

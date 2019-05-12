@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, redirect, url_for, request, jsonify
+from flask import Blueprint, render_template
+from flask import redirect, url_for, request, jsonify
 from datetime import date, datetime
 from cms import db
 from cms.models import MedicalRecord, Patient
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib import style
 style.use('ggplot')
 from sklearn.cluster import KMeans
+import json
 
 dashboard = Blueprint('dashboard', __name__)
 
@@ -29,8 +31,41 @@ def get_statistics(gender):
     result = db.engine.execute(sql)
     return result
 
+def get_pie():
+    query = '''SELECT COUNT(findings.findings) as count,
+            patients.address
+        FROM
+            findings,
+            medical_records,
+            patients
+        WHERE
+            findings.id = medical_records.findings_id AND
+            medical_records.patient_id = patients.id
+        GROUP BY patients.address'''
+    
+    result = db.engine.execute(query)
+    return result
+
+def get_area_most():
+    query = '''SELECT count, address FROM 
+            (SELECT COUNT(findings.findings) as count,patients.address
+        FROM
+            findings,
+            medical_records,
+            patients
+        WHERE
+            findings.id = medical_records.findings_id AND
+            medical_records.patient_id = patients.id
+        GROUP BY patients.address) as T ORDER BY count DESC'''
+
+    result = db.engine.execute(query)
+    
+    return result
+
 @dashboard.route('/', methods=['GET', 'POST'])
 def index():
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     medical_records = MedicalRecord.query.all()    
     medical_records_schema = RecordSchema(many=True, only=['findings', 
         'patient', 'date'])
@@ -52,8 +87,8 @@ def index():
         statistics['patient_count']['female'] += result.case_count
         if not any(entry['name'] == 
             result.findings for entry in statistics['findings']):
-            statistics['findings'] += [{ 'name' : result.findings, 'male_count': 0, 
-                'female_count': result.case_count }]
+            statistics['findings'] += [{ 'name' : result.findings, 
+                'male_count': 0,  'female_count': result.case_count }]
         for entry in statistics['findings']:
             if(entry['name'] == result.findings):
                 entry['female_count'] = result.case_count
@@ -101,8 +136,17 @@ def index():
             int(centroids[i][0]),
             int(centroids[i][1])
         ]]
+
+    pie = { "data": [], "labels": [] }
+
+    for entry in get_pie():
+        pie['data'].append(entry['count'])
+        pie['labels'].append(entry['address'])
+
+    pie['labels'] = json.dumps(pie['labels'])
+    
     return render_template('dashboard/index.html', data=data, 
-        statistics=statistics)
+        statistics=statistics, pie=pie, most=get_area_most())
 
 @dashboard.route('/all', methods=['GET', 'POST'])
 def month():
@@ -119,7 +163,7 @@ def month():
         record['gender'] = 1 if record['patient']['gender'] == 'Male' else 2
         record['age'] = calculate_age(record['patient']['date_of_birth'])
         del(record['patient'])
-        print(record)
+        
     return jsonify(output)
     return redirect(url_for('patients.index'))
 

@@ -4,6 +4,7 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from cms.filters import format_date, format_datetime, format_age
+import os, json
 
 app = Flask(__name__)
 
@@ -14,6 +15,9 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
+
+ROOT_DIR = os.path.dirname(__file__)
+env = json.load(open(os.path.join(ROOT_DIR, '.env.json'), 'r'))
 
 app.jinja_env.filters['datetime'] = format_datetime
 app.jinja_env.filters['date'] = format_date
@@ -26,8 +30,10 @@ from cms.dashboard.routes import dashboard
 from cms.medical_records.routes import medical_records
 from cms.doctors_schedule.routes import doctors_schedule
 from cms.medicine_inventory.routes import medicine_inventory
+from cms.front_page.routes import front_page
 
 app.register_blueprint(users, url_prefix='/')
+app.register_blueprint(front_page, url_prefix='/front_page')
 app.register_blueprint(patients, url_prefix='/patients')
 app.register_blueprint(lab_exams, url_prefix='/lab_exams')
 app.register_blueprint(dashboard, url_prefix='/dashboard')

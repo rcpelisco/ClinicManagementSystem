@@ -1,0 +1,130 @@
+{% extends "master.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h4>Patient Info</h4>
+        <hr class="mt-1">
+        <div class="row">
+          <div class="col-5">Name:</div>
+          <div class="col-7">{{ patient.first_name }} 
+            {{ patient.last_name }}</div>
+          </div>
+          <div class="row">
+            <div class="col-5">Date of birth:</div>
+            <div class="col-7">{{ patient.date_of_birth|date }}</div>
+          </div>
+          <div class="row">
+            <div class="col-5">Address:</div>
+            <div class="col-7">{{ patient.address }}</div>
+        </div>
+        <div class="row">
+          <div class="col-5">Contact no.:</div>
+          <div class="col-7">{{ patient.contact_no }}</div>
+        </div>
+        <div class="row">
+          <div class="col-5">Gender:</div>
+          <div class="col-7">{{ patient.gender|capitalize }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h3 class="display-inline-block">Medical Records</h3>
+        <table class="table table-sm">
+          <thead>
+            <th>Date</th>
+            <th>Symptoms</th>
+            <th>Findings</th>
+          </thead>
+          <tbody>
+            {% for medical_record in patient.medical_records %}
+            <tr>
+              <td>{{ medical_record.date }}</td>
+              <td>
+                {% for symptom in medical_record.symptoms %}
+                {{ symptom.symptom }}{{ ", " if not loop.last }}
+                {% if loop.index % 2 == 0 %}
+                  <br>
+                {% endif %}
+                {% endfor %}
+                </td>
+              <td>{{ medical_record.findings.findings }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h3 class="display-inline-block">Appointment Requests</h3>
+        <table class="table table-sm">
+          <thead>
+            <th>Date</th>
+            <th>Doctor</th>
+            <th>Status</th>
+          </thead>
+          <tbody>
+            {% for appointment in appointments %}
+            <tr>
+              <td>{{ appointment.date }}</td>
+              <td>
+                  {{ appointment.doctor.name }}
+              </td>
+              <td>{{ appointment.status|capitalize }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <hr>
+        <button class="btn btn-primary" data-toggle="modal" 
+          data-target="#requestModal">Request appointment</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="requestModal" tabindex="-1" role="dialog" 
+  aria-labelledby="requestModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form action="{{ url_for('doctors_schedule.request_appointment') }}" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title" id="requestModalLabel">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="patient_id" class="form-control" value="{{ patient.id }}">
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input type="datetime-local" class="form-control" name="date" 
+              id="date" required>
+          </div>
+          <div class="form-group">
+            <label for="doctor">Doctor</label>
+            <select class="form-control" name="doctor_id" id="doctor_id" required>
+              {% for doctor in doctors %}
+                <option value="{{ doctor.id }}">{{ doctor.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

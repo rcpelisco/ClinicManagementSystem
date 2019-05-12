@@ -15,6 +15,8 @@ medical_records = Blueprint('medical_records', __name__)
 
 @medical_records.route('/', methods=['GET'])
 def index():
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     medical_records = MedicalRecord.query.all()    
     medical_records_schema = MedicalRecordSchema(many=True)
     output = medical_records_schema.dump(medical_records).data
@@ -24,6 +26,8 @@ def index():
 
 @medical_records.route('/<medical_record>', methods=['GET'])
 def view(medical_record):
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     medical_record = MedicalRecord.query.get(medical_record)  
     # medical_record_schema = MedicalRecordSchema()
     # output = medical_record_schema.dump(medical_record).data
@@ -33,6 +37,8 @@ def view(medical_record):
 
 @medical_records.route('/<medical_record>/print', methods=['GET'])
 def print_report(medical_record):
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     options = {
         'page-size': 'A4',
         'margin-top': '0.5in',
@@ -54,6 +60,8 @@ def print_report(medical_record):
 
 @medical_records.route('/<patient>/create', methods=['GET', 'POST'])
 def create(patient):
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     form = CreateMedicalRecordForm()
     lab_exam_form = CreateLabExamForm()
     cbc_exam_form = CreateCBCExamForm()
@@ -109,6 +117,8 @@ def create(patient):
 
 @medical_records.route('/<medical_record>/edit', methods=['GET', 'POST'])
 def edit(medical_record):
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     medical_record = MedicalRecord.query.get(medical_record)
     symptoms = Symptom.query.with_entities(Symptom.symptom).distinct().all()
     medical_record_schema = MedicalRecordSchema()
@@ -165,6 +175,8 @@ def edit(medical_record):
 
 @medical_records.route('/<medical_record>/pay', methods=['GET'])
 def pay(medical_record):
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     medical_record = MedicalRecord.query.get(medical_record)
     medical_record_schema = MedicalRecordSchema()
     output = medical_record_schema.dump(medical_record).data
@@ -186,6 +198,8 @@ def update():
 
 @medical_records.route('<medical_record>/delete/', methods=['GET'])
 def delete(medical_record):
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
     medical_record = MedicalRecord.query.get(int(medical_record))
     db.session.delete(medical_record)
     db.session.commit()

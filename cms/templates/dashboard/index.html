@@ -12,7 +12,7 @@
         <div class="row">
           <div class="col-sm-5">
             <h4 class="card-title mb-0">Disease Clustering</h4>
-            <div class="small text-muted">Ckustered data of diseases</div>
+            <div class="small text-muted">Clustered data of diseases</div>
           </div>
         </div>
         <hr>
@@ -69,6 +69,30 @@
         </div>
       </div>
     </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-5">
+            <h4 class="card-title mb-0">Area with the most findings</h4>
+            <div class="small text-muted">Location</div>
+          </div>
+        </div>
+        <hr class="mt-0">
+        <div class="row">
+          {% for area in most %}
+          {% if loop.index < 4 %}
+          <div class="col-sm-4">
+            <div class="callout callout-info">
+              <small class="text-muted">{{ area.address }}</small>
+              <br>
+              <strong class="h4"><span class="text-muted">Count: </span>{{ area.count }}</strong>
+            </div>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
   </div>
   <div class="col-lg-6">
     <div class="card">
@@ -98,75 +122,113 @@
         </div>
       </div>
     </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-5">
+            <h4 class="card-title mb-0">Location</h4>
+            <div class="small text-muted">Location</div>
+          </div>
+        </div>
+        <hr>
+        <canvas id="pie" width="400" height="400"></canvas>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock content %}
 
 {% block javascript %}
 <script src="{{ url_for('static', filename='vendors/chart.js/dist/Chart.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendors/distinct-colors/distinct-colors.min.js') }}"></script>
 <script>
-    window.chartColors = {
-      red: 'rgb(255, 99, 132)',
-      orange: 'rgb(255, 159, 64)',
-      yellow: 'rgb(255, 205, 86)',
-      green: 'rgb(75, 192, 192)',
-      blue: 'rgb(54, 162, 235)',
-      purple: 'rgb(153, 102, 255)',
-      grey: 'rgb(201, 203, 207)'
-    };
-    
-		var color = Chart.helpers.color;
-		function generateData() {
-      let jsondata = JSON.parse("{{ data|safe }}");
-      let data = []
-      let dataset = []
-      let colorChoices = [window.chartColors.red, window.chartColors.blue, 
-        window.chartColors.yellow]
-      data['dataset'] = jsondata[0]
-      data['centroids'] = jsondata[1]
-      data['centroids'].forEach(function(e, i) {
-        dataset[data['dataset'].length + i] = {
-          borderColor: colorChoices[i],
-          backgroundColor: color(colorChoices[i]).alpha(0.2).rgbString(),
-          pointStyle: 'cross',
-          data: e.map(function(e) {
-            return {'x': e[0], 'y': e[1]}
-          })
-        }
-      })
-      data['dataset'].forEach(function(e, i) {
-        dataset[i] = {
-          label: 'Cluster ' + (i + 1),
-          borderColor: color(colorChoices[i]).alpha(0.4).rgbString(),
-          backgroundColor: color(colorChoices[i]).alpha(0.2).rgbString(),
-          data: e.map(function(e) {
-            return {'x': e[0], 'y': e[1]}
-          })
-        }
-      })
-      console.log(dataset)
-			return dataset;
-		}
-		var scatterChartData = {
-			datasets: generateData()
-		};
+  window.chartColors = {
+    red: 'rgb(255, 99, 132)',
+    orange: 'rgb(255, 159, 64)',
+    yellow: 'rgb(255, 205, 86)',
+    green: 'rgb(75, 192, 192)',
+    blue: 'rgb(54, 162, 235)',
+    purple: 'rgb(153, 102, 255)',
+    grey: 'rgb(201, 203, 207)'
+  }
+  
+  let color = Chart.helpers.color
 
-		window.onload = function() {
-			var ctx = document.getElementById('kmeans').getContext('2d');
-			window.myScatter = Chart.Scatter(ctx, {
-				data: scatterChartData,
-				options: {
-					title: {
-						display: false,
-						text: 'Disease clustering using K Means'
-          },
-          legend: {
-            display: false
-          }
-				}
-			});
-		};
+  function generateData() {
+    let jsondata = JSON.parse("{{ data|safe }}")
+    let data = []
+    let dataset = []
+    let colorChoices = [window.chartColors.red, window.chartColors.blue, 
+      window.chartColors.yellow]
+    data['dataset'] = jsondata[0]
+    data['centroids'] = jsondata[1]
+    data['centroids'].forEach(function(e, i) {
+      dataset[data['dataset'].length + i] = {
+        borderColor: colorChoices[i],
+        backgroundColor: color(colorChoices[i]).alpha(0.2).rgbString(),
+        pointStyle: 'cross',
+        data: e.map(function(e) {
+          return {'x': e[0], 'y': e[1]}
+        })
+      }
+    })
+    data['dataset'].forEach(function(e, i) {
+      dataset[i] = {
+        label: 'Cluster ' + (i + 1),
+        borderColor: color(colorChoices[i]).alpha(0.4).rgbString(),
+        backgroundColor: color(colorChoices[i]).alpha(0.2).rgbString(),
+        data: e.map(function(e) {
+          return {'x': e[0], 'y': e[1]}
+        })
+      }
+    })
+    return dataset
+  }
 
-		
+  window.onload = function() {
+    let kmeansCanvas = document.getElementById('kmeans').getContext('2d')
+
+    window.myScatter = Chart.Scatter(kmeansCanvas, {
+      data: { datasets: generateData() },
+      options: {
+        title: {
+          display: false,
+          text: 'Disease clustering using K Means'
+        },
+        legend: {
+          display: false
+        }
+      }
+    })
+
+    let pieCanvas = document.getElementById('pie').getContext('2d')
+    let pie = new Chart(pieCanvas, {
+      type: 'pie',
+      data: { 
+        datasets: [{ 
+            data: {{ pie.data }}, 
+          backgroundColor: generateBGColor() 
+        }],
+        labels: {{ pie.labels|safe }}
+      },
+      options: {
+        legend: {
+          display: false
+        }
+      }
+    })
+
+    function generateBGColor() {
+      let len = {{ pie.data|length }}
+      let paletteArray = new DistinctColors({count: len});
+      let palette = []
+      paletteArray.forEach(function(e, i) {
+        palette.push('rgba(' + e['_rgb'][0] + ', ' + e['_rgb'][1] + ', ' 
+          + e['_rgb'][2] + ', ' + e['_rgb'][3] + ')')
+      })
+      console.log(palette)
+      return palette
+    }
+  }
 </script>
 {% endblock javascript %}

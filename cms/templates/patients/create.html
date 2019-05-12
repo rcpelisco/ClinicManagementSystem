@@ -64,7 +64,8 @@
 {% endblock content %}
 
 {% block javascript %}
-<script src="{{ url_for('static', filename='vendors/moment/moment.js') }}"></script>
+<script src="{{ url_for('static', filename='vendors/moment/moment.js') }}">
+</script>
 <script src="{{ url_for('static', filename='vendors/tempusdominus-datetimepicker/js/main.min.js') }}"></script>
 <script>
   $(function () {
