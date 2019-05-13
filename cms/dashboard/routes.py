@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template
 from flask import redirect, url_for, request, jsonify
+from flask_login import current_user
 from datetime import date, datetime
 from cms import db
 from cms.models import MedicalRecord, Patient

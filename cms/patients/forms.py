@@ -14,7 +14,7 @@ class CreatePatientForm(FlaskForm):
     gender = SelectField('Gender', choices=[('male', 'Male'), 
         ('female', 'Female')])
     address = StringField('Address', validators=[DataRequired()])
-    contact_no = StringField('Contact no', Length(min=9, max=9))
+    contact_no = StringField('Contact no', validators=[Length(min=10, max=10)])
     submit = SubmitField('Add Patient')
  
 class EditPatientForm(CreatePatientForm):

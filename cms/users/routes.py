@@ -22,7 +22,7 @@ def register():
         hashed = bcrypt.generate_password_hash(form.password.data)\
             .decode('utf-8')
         user = User(name=form.name.data, position=form.position.data,
-            username=form.username.data, password=hashed)
+            username=form.username.data, password=hashed, patient_id=0)
         db.session.add(user)
         db.session.commit()
         flash(f'Account created for {form.username.data}! You can now log in.', 

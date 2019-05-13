@@ -15,7 +15,7 @@ class User(db.Model, UserMixin):
     position = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'),
-        nullable=False)
+        nullable=False, default=0)
 
 class Patient(db.Model):
     __tablename__ = 'patients'
