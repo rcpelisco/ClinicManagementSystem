@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, make_response
 from flask import redirect, url_for, request, jsonify
 from flask_login import current_user
 from datetime import date, datetime
@@ -12,6 +12,7 @@ from matplotlib import style
 style.use('ggplot')
 from sklearn.cluster import KMeans
 import json
+import pdfkit
 
 dashboard = Blueprint('dashboard', __name__)
 
@@ -48,8 +49,8 @@ def get_pie():
     return result
 
 def get_area_most():
-    query = '''SELECT count, address FROM 
-            (SELECT COUNT(findings.findings) as count,patients.address
+    query = '''SELECT findings, count, address FROM 
+            (SELECT findings.findings, COUNT(findings.findings) as count, patients.address
         FROM
             findings,
             medical_records,
@@ -63,8 +64,64 @@ def get_area_most():
     
     return result
 
+def get_findings_count_from_location():
+    query = '''SELECT findings, address FROM 
+            (SELECT findings.findings, patients.address
+        FROM
+            findings,
+            medical_records,
+            patients
+        WHERE
+            findings.id = medical_records.findings_id AND
+            medical_records.patient_id = patients.id) as T ORDER BY address DESC'''
+
+    db_result = db.engine.execute(query)
+    result = []
+    for db_entry in db_result:
+        findings, location = db_entry
+        if len(result) > 0:
+            if(result[len(result) - 1]['location'] == location):
+                continue
+        result.append({ 'location': location, 'findings': [] })
+
+    db_result = db.engine.execute(query)
+    for db_entry in db_result:
+        findings, location = db_entry
+        for entry in result:
+            if entry['location'] == location:
+                if len(entry['findings']) > 0:
+                    if entry['findings'][len(entry['findings']) - 1]['findings'] == findings:
+                        entry['findings'][len(entry['findings']) - 1]['count'] += 1
+                        continue
+                entry['findings'].append({'findings': findings, 'count': 1})
+
+    return result
+
+@dashboard.route('/print')
+def print_page():
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
+    options = {
+        'page-size': 'A4',
+        'margin-top': '0.5in',
+        'margin-right': '1in',
+        'margin-bottom': '0.5in',
+        'margin-left': '1in',
+    }
+
+    template = render_template('dashboard/print.html', most=get_area_most(), 
+        location=get_findings_count_from_location())
+    pdf = pdfkit.from_string(template, False, options=options)
+    
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=output.pdf'
+
+    return response
+
 @dashboard.route('/', methods=['GET', 'POST'])
 def index():
+    get_findings_count_from_location()
     if current_user.position == 'patient':
         return redirect(url_for('front_page.index'))
     medical_records = MedicalRecord.query.all()    
@@ -147,7 +204,8 @@ def index():
     pie['labels'] = json.dumps(pie['labels'])
     
     return render_template('dashboard/index.html', data=data, 
-        statistics=statistics, pie=pie, most=get_area_most())
+        statistics=statistics, pie=pie, most=get_area_most(), 
+        location=get_findings_count_from_location())
 
 @dashboard.route('/all', methods=['GET', 'POST'])
 def month():

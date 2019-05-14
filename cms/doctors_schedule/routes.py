@@ -105,8 +105,6 @@ def approve(appointment):
         to=appointment.patient.contact_no
     )
 
-    print(message)
-
     return redirect(url_for('doctors_schedule.appointments'))
 
 @doctors_schedule.route('/decline/<appointment>', methods=['GET'])

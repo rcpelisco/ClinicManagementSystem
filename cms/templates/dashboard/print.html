@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    .text-center {
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <table>
+    <tbody>
+      <tr>
+        <td colspan="4">
+          <h1 class="text-center">Statistical Report</h1>
+          <hr>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4"> <center> <h2>Top area</h2></center><hr width="80%"></td>
+      </tr>
+      {% for area in most %}
+      {% if loop.index < 4 %}
+      <tr>
+        <td width="35%"></td>
+        <td width="25%">{{ area.address }}: </td>
+        <td>{{ area.count }} </td>
+        <td></td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+      <tr>
+        <td colspan="4"><hr width="80%"></td>
+      </tr>
+      <tr><td colspan="4"><center><h2>Statistics</h2><hr width="80%"></center></td></tr>
+      <tr>
+        <td valign="top">
+          <table>
+            {% for entry in location[:location|length//3] %}
+            <tr>
+              <td>{{ entry.location }} 
+                <ul>
+                  {% for findings in entry.findings %} 
+                  <li>  
+                    {{ findings.findings }}: {{ findings.count }}
+                  </li>
+                  {% endfor %}
+                </ul>
+                <hr>
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+          
+        </td>
+        <td colspan="2" valign="top">
+          <table>
+            {% for entry in location[location|length//3:(location|length//3) * 2] %}
+            <tr>
+              <td>{{ entry.location }} 
+                <ul>
+                  {% for findings in entry.findings %} 
+                  <li>  
+                    {{ findings.findings }}: {{ findings.count }}
+                  </li>
+                  {% endfor %}
+                </ul>
+                <hr>
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </td>
+        <td valign="top">
+          <table>
+            {% for entry in location[(location|length//3) * 2:] %}
+            <tr>
+              <td>{{ entry.location }} 
+                <ul>
+                  {% for findings in entry.findings %} 
+                  <li>  
+                    {{ findings.findings }}: {{ findings.count }}
+                  </li>
+                  {% endfor %}
+                </ul><hr>
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+
+</html>

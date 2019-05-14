@@ -6,6 +6,11 @@
 
 {% block content %}
 <div class="row">
+  <div class="col-md-12">
+    <a href="{{ url_for('dashboard.print_page') }}" class="btn btn-primary mb-3">Print Statistics</a>
+  </div>
+</div>
+<div class="row">
   <div class="col-lg-12">
     <div class="card">
       <div class="card-body">
@@ -131,7 +136,32 @@
           </div>
         </div>
         <hr>
-        <canvas id="pie" width="400" height="400"></canvas>
+        <canvas id="pie" width="300" height="300"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-5">
+            <h4 class="card-title mb-0">Location</h4>
+            <div class="small text-muted">Location</div>
+          </div>
+        </div>
+        <hr>
+        <div class="scroll">
+          <div class="row">
+            {% for entry in location %}
+            <div class="col-sm-6">
+              <h5>{{ entry.location }}</h5>
+              <ul>
+                {% for findings in entry.findings %}
+                <li>{{ findings.findings }} - {{ findings.count }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
       </div>
     </div>
   </div>
