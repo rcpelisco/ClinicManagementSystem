@@ -39,66 +39,46 @@
       </tr>
       {% endif %}
       {% endfor %}
+    </tbody>
+  </table>
+  <center><h2>Statistics</h2><hr width="80%"></center>
+  <table border="1">
+    <thead>
       <tr>
-        <td colspan="4"><hr width="80%"></td>
+        <td>Barangay</td>
+        <td>Findings</td>
+        <td>Count</td>
       </tr>
-      <tr><td colspan="4"><center><h2>Statistics</h2><hr width="80%"></center></td></tr>
+    </thead>
+    <tbody>
+    {% for entry in location %}
+    {% for findings in entry.findings %} 
+    <tr>
+      <td>{{ entry.location }} </td>
+      <td>{{ findings.findings }}</td>
+      <td>{{ findings.count }}</td>
+    </tr>
+    {% endfor %}
+    {% endfor %}
+    </tbody>
+  </table>
+  <center><h2>Gender</h2><hr width="80%"></center>
+  <table border="1">
+    <thead>
       <tr>
-        <td valign="top">
-          <table>
-            {% for entry in location[:location|length//3] %}
-            <tr>
-              <td>{{ entry.location }} 
-                <ul>
-                  {% for findings in entry.findings %} 
-                  <li>  
-                    {{ findings.findings }}: {{ findings.count }}
-                  </li>
-                  {% endfor %}
-                </ul>
-                <hr>
-              </td>
-            </tr>
-            {% endfor %}
-          </table>
-          
-        </td>
-        <td colspan="2" valign="top">
-          <table>
-            {% for entry in location[location|length//3:(location|length//3) * 2] %}
-            <tr>
-              <td>{{ entry.location }} 
-                <ul>
-                  {% for findings in entry.findings %} 
-                  <li>  
-                    {{ findings.findings }}: {{ findings.count }}
-                  </li>
-                  {% endfor %}
-                </ul>
-                <hr>
-              </td>
-            </tr>
-            {% endfor %}
-          </table>
-        </td>
-        <td valign="top">
-          <table>
-            {% for entry in location[(location|length//3) * 2:] %}
-            <tr>
-              <td>{{ entry.location }} 
-                <ul>
-                  {% for findings in entry.findings %} 
-                  <li>  
-                    {{ findings.findings }}: {{ findings.count }}
-                  </li>
-                  {% endfor %}
-                </ul><hr>
-              </td>
-            </tr>
-            {% endfor %}
-          </table>
-        </td>
+        <td>Case</td>
+        <td>Male</td>
+        <td>Female</td>
       </tr>
+    </thead>
+    <tbody>
+      {% for findings in statistics.findings %}
+      <tr>
+        <td>{{ findings.name }}</td>
+        <td>{{ findings.male_count }}</td>
+        <td>{{ findings.female_count }}</td>
+      </tr>
+      {% endfor %}
     </tbody>
   </table>
 </body>

@@ -35,7 +35,7 @@ def get_statistics(gender):
 
 def get_pie():
     query = '''SELECT COUNT(findings.findings) as count,
-            patients.address
+            patients.address as barangay
         FROM
             findings,
             medical_records,
@@ -43,14 +43,14 @@ def get_pie():
         WHERE
             findings.id = medical_records.findings_id AND
             medical_records.patient_id = patients.id
-        GROUP BY patients.address'''
+        GROUP BY barangay'''
     
     result = db.engine.execute(query)
     return result
 
 def get_area_most():
-    query = '''SELECT findings, count, address FROM 
-            (SELECT findings.findings, COUNT(findings.findings) as count, patients.address
+    query = '''SELECT findings, count, barangay as address FROM 
+            (SELECT findings.findings, COUNT(findings.findings) as count, patients.barangay
         FROM
             findings,
             medical_records,
@@ -58,22 +58,22 @@ def get_area_most():
         WHERE
             findings.id = medical_records.findings_id AND
             medical_records.patient_id = patients.id
-        GROUP BY patients.address) as T ORDER BY count DESC'''
+        GROUP BY patients.barangay) as T ORDER BY count DESC'''
 
     result = db.engine.execute(query)
     
     return result
 
 def get_findings_count_from_location():
-    query = '''SELECT findings, address FROM 
-            (SELECT findings.findings, patients.address
+    query = '''SELECT findings, barangay as address FROM 
+            (SELECT findings.findings, patients.barangay
         FROM
             findings,
             medical_records,
             patients
         WHERE
             findings.id = medical_records.findings_id AND
-            medical_records.patient_id = patients.id) as T ORDER BY address DESC'''
+            medical_records.patient_id = patients.id) as T ORDER BY address, findings DESC'''
 
     db_result = db.engine.execute(query)
     result = []
@@ -110,7 +110,7 @@ def print_page():
     }
 
     template = render_template('dashboard/print.html', most=get_area_most(), 
-        location=get_findings_count_from_location())
+        location=get_findings_count_from_location(), statistics=get_gen_statistics())
     pdf = pdfkit.from_string(template, False, options=options)
     
     response = make_response(pdf)
@@ -119,18 +119,7 @@ def print_page():
 
     return response
 
-@dashboard.route('/', methods=['GET', 'POST'])
-def index():
-    get_findings_count_from_location()
-    if current_user.position == 'patient':
-        return redirect(url_for('front_page.index'))
-    medical_records = MedicalRecord.query.all()    
-    medical_records_schema = RecordSchema(many=True, only=['findings', 
-        'patient', 'date'])
-    output = medical_records_schema.dump(medical_records).data
-    male_count = Patient.query.filter(Patient.gender == 'male').count()
-    female_count = Patient.query.filter(Patient.gender == 'female').count()
-
+def get_gen_statistics():
     male_result = get_statistics('male')
     female_result = get_statistics('female')
     
@@ -150,9 +139,21 @@ def index():
         for entry in statistics['findings']:
             if(entry['name'] == result.findings):
                 entry['female_count'] = result.case_count
-                
-    print(statistics)
-    # return ''
+    
+    return statistics
+
+@dashboard.route('/', methods=['GET', 'POST'])
+def index():
+    get_findings_count_from_location()
+    if current_user.position == 'patient':
+        return redirect(url_for('front_page.index'))
+    medical_records = MedicalRecord.query.all()    
+    medical_records_schema = RecordSchema(many=True, only=['findings', 
+        'patient', 'date'])
+    output = medical_records_schema.dump(medical_records).data
+
+    statistics = get_gen_statistics()
+
     clusters = 3
 
     if(len(output) < clusters):
