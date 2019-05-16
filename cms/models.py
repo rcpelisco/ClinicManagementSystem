@@ -24,6 +24,7 @@ class Patient(db.Model):
     last_name = db.Column(db.String(50), nullable=False)
     gender = db.Column(db.String(50), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
+    barangay = db.Column(db.String(255), nullable=False)
     address = db.Column(db.String(255), nullable=False)
     contact_no = db.Column(db.String(20))
 

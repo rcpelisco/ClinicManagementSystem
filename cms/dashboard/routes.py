@@ -200,7 +200,7 @@ def index():
 
     for entry in get_pie():
         pie['data'].append(entry['count'])
-        pie['labels'].append(entry['address'])
+        pie['labels'].append(entry['barangay'])
 
     pie['labels'] = json.dumps(pie['labels'])
     

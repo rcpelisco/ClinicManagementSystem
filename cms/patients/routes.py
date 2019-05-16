@@ -41,6 +41,7 @@ def save():
             last_name=form.last_name.data,
             gender=form.gender.data,
             date_of_birth=form.date_of_birth.data,
+            barangay=form.barangay.data,
             address=form.address.data,
             contact_no=form.contact_no.data)
         db.session.add(patient)
@@ -66,6 +67,7 @@ def update():
         patient.gender = form.gender.data
         patient.last_name = form.last_name.data
         patient.date_of_birth = form.date_of_birth.data
+        patient.barangay = form.barangay.data
         patient.address = form.address.data
         patient.contact_no = form.contact_no.data
         
